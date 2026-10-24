@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AapdaSetu Disaster OS | AI-Assisted Disaster Response & Rescue Prioritization</title>
+  
+  <!-- Google Fonts: Inter & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS for Live OpenStreetMap -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  
+  <!-- AapdaSetu Custom Command Center CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="command-center-body">
+
+  <!-- TOP BRAND HEADER (Matching Reference Image) -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo-mark" aria-hidden="true">A</div>
+      <div class="logo-text-group">
+        <div class="title-with-badge">
+          <h1 class="app-title">AapdaSetu Disaster OS</h1>
+          <span class="team-badge">TEAM TECH INNOVATORS</span>
+        </div>
+        <p class="app-subtitle">Granular Telemetry • TinyFish + Google Gemini + OpenStreetMap</p>
+      </div>
+    </div>
+
+    <!-- Search input -->
+    <div class="header-center">
+      <div class="search-bar-wrapper">
+        <span class="search-prefix">Search Any Place in India:</span>
+        <input type="text" id="search-input" class="search-input" placeholder="Assam, Wayanad, Odisha, Himachal..." value="Assam" aria-label="Search disaster location">
+      </div>
+    </div>
+
+    <!-- Top Action Buttons -->
+    <div class="header-right">
+      <button id="btn-trigger-scan" class="btn-top btn-amber" title="Simulate satellite and sensor polling">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span>Trigger Live TinyFish Scan</span>
+      </button>
+
+      <button id="btn-inject-sos" class="btn-top btn-purple" title="Report a new emergency incident">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Inject Field SOS</span>
+      </button>
+
+      <button id="btn-offline-sms" class="btn-top btn-teal" title="View 2G SMS and air-gapped emergency protocol">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+        <span>Offline PWA & 2G SMS</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- SECONDARY SUB-HEADER (Quick Jump & Status) -->
+  <nav class="sub-header-bar" aria-label="Disaster region navigation">
+    <div class="quick-jump-group">
+      <span class="quick-jump-label">Quick Jump:</span>
+      <button class="quick-jump-tag active-jump" data-region="Assam">Assam</button>
+      <button class="quick-jump-tag" data-region="Odisha">Odisha</button>
+      <button class="quick-jump-tag" data-region="Himachal">Himachal</button>
+      <button class="quick-jump-tag" data-region="Kerala">Kerala</button>
+      <button class="quick-jump-tag" data-region="Delhi NCR">Delhi NCR</button>
+    </div>
+
+    <div class="osm-status-pill">
+      <span class="osm-bullet">●</span>
+      <span class="osm-text">[OSM Nominatim] Plotted <strong id="status-pin-count">4</strong> verified pins onto OpenStreetMap.</span>
+      <span class="ttl-badge">TTL Cache: LIVE</span>
+    </div>
+
+    <div class="header-aux-controls">
+      <button id="btn-explain-ai" class="aux-link-btn" title="Inspect mathematical formula">
+        🧠 Explainable AI Formula
+      </button>
+      <button id="btn-reset-data" class="aux-link-btn" title="Reset sample data">
+        ↺ Reset Demo
+      </button>
+    </div>
+  </nav>
+
+  <!-- HACKATHON DEMO & SAFETY NOTICE BANNER -->
+  <aside class="demo-disclaimer-banner" role="alert">
+    <span class="disclaimer-badge">HACKATHON EVALUATION MODE</span>
+    <span class="disclaimer-text">
+      Ground telemetry, river gauges, and SOS feeds are <strong>simulated scenarios</strong> for hackathon demonstration. 
+      No live emergency alerts are dispatched to real 112/NDRF operators. Leaflet OpenStreetMap and AI Urgency Engine are fully functional client-side.
+    </span>
+  </aside>
+
+  <!-- MAIN 3-PANEL COMMAND CENTER LAYOUT -->
+  <main class="command-grid-layout">
+
+    <!-- PANEL 1: INGESTION STREAM (Left Column) -->
+    <section class="panel-column stream-column" aria-label="Ingestion stream feed">
+      <div class="panel-header-stream">
+        <div class="stream-title-row">
+          <span class="panel-step-num">1. INGESTION STREAM</span>
+          <span id="active-pin-count" class="badge-pins-count">4 Pins</span>
+        </div>
+        <div id="active-sector-label" class="sector-sublabel">Sector: Assam (Brahmaputra Flood Zone)</div>
+
+        <!-- Filter Tabs -->
+        <div class="stream-filter-tabs" role="tablist">
+          <button class="filter-pill active" data-filter="all">All</button>
+          <button class="filter-pill" data-filter="hazard">Hazards</button>
+          <button class="filter-pill" data-filter="shelter">Shelters</button>
+          <button class="filter-pill" data-filter="critical">Critical</button>
+          <button class="filter-pill" data-filter="verified">Verified</button>
+          <button class="filter-pill" data-filter="pending">Pending</button>
+        </div>
+      </div>
+
+      <!-- Scrollable Cards Feed -->
+      <div id="ingestion-stream-list" class="stream-scroll-container">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </section>
+
+    <!-- PANEL 2: INTERACTIVE LEAFLET OPENSTREETMAP (Center Column) -->
+    <section class="panel-column map-column" aria-label="Disaster GIS Map">
+      <div id="osm-map-container" class="leaflet-map-wrapper">
+        <!-- Leaflet renders here -->
+      </div>
+
+      <!-- Bottom Map Legend Bar (Matches Screenshot) -->
+      <footer class="map-bottom-legend-bar">
+        <div class="legend-items">
+          <div class="legend-item">
+            <span class="legend-dot dot-hazard"></span>
+            <span>Hazard / Roadblock</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot dot-shelter"></span>
+            <span>Relief Shelter</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot dot-gps"></span>
+            <span>Click Map to Pin SOS</span>
+          </div>
+        </div>
+
+        <div class="map-attribution-info">
+          Leaflet | © OpenStreetMap | AapdaSetu OS 2.0
+        </div>
+      </footer>
+    </section>
+
+    <!-- PANEL 3: GRANULAR TELEMETRY & CO-PILOT (Right Column) -->
+    <section class="panel-column telemetry-column" aria-label="Granular telemetry and AI co-pilot">
+      <div class="panel-header-telemetry">
+        <span class="panel-step-num">2. GRANULAR TELEMETRY &amp; CO-PILOT</span>
+        <p class="telemetry-sublabel">Inspect affected zone metrics, camp occupancy, and SDMA overrides.</p>
+      </div>
+
+      <div id="telemetry-details-container" class="telemetry-scroll-container">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: + INJECT FIELD SOS INCIDENT REPORTING FORM -->
+  <div id="sos-modal" class="modal-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="sos-modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon-badge">🚨</span>
+          <div>
+            <h2 id="sos-modal-title" class="modal-title">Inject Field SOS Incident</h2>
+            <p class="modal-subtitle">Log disaster telemetry with real-time AI Urgency calculation</p>
+          </div>
+        </div>
+        <button id="close-sos-modal" class="btn-close-modal" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <form id="sos-form" class="sos-form-grid">
+        <!-- Title & Sector -->
+        <div class="form-group full-width">
+          <label for="sos-title">Incident Title *</label>
+          <input type="text" id="sos-title" required placeholder="e.g. NH-37 Submergence or Meppadi Landslide Cutoff" value="Barpeta Embankment Overtopping">
+        </div>
+
+        <div class="form-group">
+          <label for="sos-region">Indian Disaster Region</label>
+          <select id="sos-region">
+            <option value="Assam" selected>Assam (Brahmaputra Flood Basin)</option>
+            <option value="Kerala">Kerala (Wayanad Ghats Landslide)</option>
+            <option value="Odisha">Odisha (Bay of Bengal Cyclone)</option>
+            <option value="Himachal">Himachal (Beas / Sutlej Flash Flood)</option>
+            <option value="Delhi NCR">Delhi NCR (Yamuna Floodplain)</option>
+            <option value="Other">Other Disaster Zone</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="sos-sector">Local Sector / Landmark *</label>
+          <input type="text" id="sos-sector" required placeholder="e.g. Nagaon Rural Sector 4" value="Barpeta Low-Lying Sector 2">
+        </div>
+
+        <div class="form-group">
+          <label for="sos-type">Incident Type</label>
+          <select id="sos-type">
+            <option value="Hazard / Roadblock" selected>Hazard / Roadblock</option>
+            <option value="Hazard / Flash Flood">Hazard / Flash Flood</option>
+            <option value="Hazard / Landslide">Hazard / Landslide</option>
+            <option value="Hazard / Structural Collapse">Hazard / Structural Collapse</option>
+            <option value="Relief Shelter">Relief Shelter</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="sos-category">Classification</label>
+          <select id="sos-category">
+            <option value="hazard" selected>Hazard / Danger Zone (Red Pin)</option>
+            <option value="shelter">Relief Shelter (Teal Pin)</option>
+          </select>
+        </div>
+
+        <!-- AI Engine Input 1: Severity -->
+        <div class="form-group">
+          <label for="sos-severity">Disaster Severity (Weight: 35%) *</label>
+          <select id="sos-severity">
+            <option value="critical" selected>Critical (Catastrophic Breach / Rising Fast)</option>
+            <option value="high">High (Severe Flooding / Heavy Blockage)</option>
+            <option value="moderate">Moderate (Localized Inundation / Mudslide)</option>
+            <option value="minor">Minor (Controlled / Precautionary)</option>
+          </select>
+        </div>
+
+        <!-- AI Engine Input 2: People Affected -->
+        <div class="form-group">
+          <label for="sos-people">People Affected / At Risk (Weight: 30%) *</label>
+          <input type="number" id="sos-people" min="1" max="100000" value="380" required>
+        </div>
+
+        <!-- AI Engine Input 3: Medical Care Access -->
+        <div class="form-group">
+          <label for="sos-medical">Access to Medical Care (Weight: 20%) *</label>
+          <select id="sos-medical">
+            <option value="trapped" selected>Trapped / Zero Egress (Highest Risk)</option>
+            <option value="critical_injuries">Critical Injuries / Cut Off from Hospital</option>
+            <option value="delayed">Delayed Access (6-12 Hours Away)</option>
+            <option value="stable">Stable / Local First Aid Available</option>
+          </select>
+        </div>
+
+        <!-- AI Engine Input 4: Source Reliability -->
+        <div class="form-group">
+          <label for="sos-source">Source Reliability (Weight: 15%) *</label>
+          <select id="sos-source">
+            <option value="ndrf_gov" selected>NDRF / SDRF Official Dispatch (100% Trust)</option>
+            <option value="verified_responder">Verified First Responder / Field Doctor (85% Trust)</option>
+            <option value="multi_citizen">Multi-Citizen Geo-Tagged Posts (65% Trust)</option>
+            <option value="unverified">Single Unverified Citizen Report (40% Trust)</option>
+          </select>
+        </div>
+
+        <!-- Coordinates -->
+        <div class="form-group">
+          <label for="sos-lat">Latitude (Click map to auto-fill)</label>
+          <input type="number" step="0.0001" id="sos-lat" value="26.3200">
+        </div>
+
+        <div class="form-group">
+          <label for="sos-lng">Longitude (Click map to auto-fill)</label>
+          <input type="number" step="0.0001" id="sos-lng" value="91.0040">
+        </div>
+
+        <!-- Description -->
+        <div class="form-group full-width">
+          <label for="sos-desc">Field Observation &amp; Ground Telemetry Extract</label>
+          <textarea id="sos-desc" rows="2" placeholder="Enter sensor measurements, NDRF unit status, or eyewitness description...">River water breached secondary ring bund. 4 hamlets submerged up to 2.1m. Evacuation boats requested immediately.</textarea>
+        </div>
+
+        <!-- LIVE AI CALCULATION PREVIEW BOX -->
+        <div class="ai-live-calc-box full-width">
+          <div class="calc-box-header">
+            <span>⚡ REAL-TIME AI RESCUE ENGINE PREVIEW</span>
+            <span id="preview-ai-tier" class="preview-tier-badge badge-critical">CRITICAL</span>
+          </div>
+          <div class="calc-box-body">
+            <div class="calc-score-display">
+              <span class="calc-score-number" id="preview-ai-score">89%</span>
+              <span class="calc-score-label">Urgency Score</span>
+            </div>
+            <div class="calc-math-explanation">
+              <p>Formula: <code>(0.35 × S) + (0.30 × P) + (0.20 × M) + (0.15 × R)</code></p>
+              <p id="preview-ai-breakdown" class="breakdown-preview-text">Evaluating parameters in real time...</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions-row full-width">
+          <button type="button" class="btn-cancel" onclick="document.getElementById('sos-modal').classList.remove('modal-visible')">Cancel</button>
+          <button type="submit" class="btn-submit-sos">Deploy to AapdaSetu OS &rarr;</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: OFFLINE PWA & 2G SMS ARCHITECTURE -->
+  <div id="sms-modal" class="modal-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="sms-modal-title">
+    <div class="modal-card modal-compact">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon-badge">📶</span>
+          <div>
+            <h2 id="sms-modal-title" class="modal-title">Offline PWA &amp; 2G SMS Mesh Architecture</h2>
+            <p class="modal-subtitle">How AapdaSetu operates when cellular towers collapse</p>
+          </div>
+        </div>
+        <button id="close-sms-modal" class="btn-close-modal" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <div class="sms-architecture-content">
+        <div class="sms-step-box">
+          <h4>1. 2G Low-Bandwidth SMS Ingestion Protocol</h4>
+          <p>In zero-internet flood zones, field workers send structured compact SMS to our gateway number:</p>
+          <div class="code-pill">
+            <code>ASETU SOS [SECTOR] [HAZARD_TYPE] [PEOPLE] [MED_URGENCY]</code>
+          </div>
+          <p class="sms-example-hint">Example: <code>ASETU SOS NAGAON FLOOD 150 TRAPPED</code></p>
+        </div>
+
+        <div class="sms-step-box">
+          <h4>2. Explainable Rule Parser &amp; Geocoding</h4>
+          <p>The gateway extracts GPS or sector tokens, assigns standard weights, and injects the incident directly into the SDMA operator's dashboard.</p>
+        </div>
+
+        <div class="sms-step-box">
+          <h4>3. Offline PWA Local Cache</h4>
+          <p>Local state, emergency manuals, and priority matrices are cached via ServiceWorker and LocalStorage, operating 100% offline in air-gapped emergency tents.</p>
+        </div>
+
+        <div class="disclaimer-note">
+          <em>Note: This is a simulated hackathon architecture walkthrough. Real production rollout connects to C-DOT Common Alerting Protocol (CAP) and Telecom Service Provider SMS gateways.</em>
+        </div>
+
+        <button class="btn-primary-close" onclick="document.getElementById('sms-modal').classList.remove('modal-visible')">
+          Close Walkthrough
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EXPLAINABLE AI (XAI) MATHEMATICAL BREAKDOWN -->
+  <div id="explain-modal" class="modal-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="explain-modal-title">
+    <div class="modal-card modal-compact">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon-badge">🧠</span>
+          <div>
+            <h2 id="explain-modal-title" class="modal-title">AapdaSetu Explainable AI (XAI) Methodology</h2>
+            <p class="modal-subtitle">Transparent, Deterministic Rescue Prioritization</p>
+          </div>
+        </div>
+        <button id="close-explain-modal" class="btn-close-modal" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <div class="sms-architecture-content">
+        <p>In life-or-death disaster triage, <strong>opaque black-box AI models that hallucinate cannot be trusted</strong>. AapdaSetu uses an open-box, multi-criteria mathematical scoring model that produces transparent, auditable scores (0–100%):</p>
+
+        <div class="formula-callout">
+          <strong>Urgency Score</strong> = (0.35 &times; S) + (0.30 &times; P) + (0.20 &times; M) + (0.15 &times; R)
+        </div>
+
+        <div class="factors-table-wrap">
+          <table class="factors-table">
+            <thead>
+              <tr>
+                <th>Factor</th>
+                <th>Weight</th>
+                <th>Parameters Evaluated</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Disaster Severity (S)</strong></td>
+                <td>35%</td>
+                <td>Breach velocity, structural stability, rapid flood depth, landslide scale.</td>
+              </tr>
+              <tr>
+                <td><strong>Population at Risk (P)</strong></td>
+                <td>30%</td>
+                <td>Logarithmic scaling of affected headcount (vulnerable elderly, children, trapped groups).</td>
+              </tr>
+              <tr>
+                <td><strong>Medical Care Urgency (M)</strong></td>
+                <td>20%</td>
+                <td>Degree of entrapment, hypothermia risk, severed hospital connectivity.</td>
+              </tr>
+              <tr>
+                <td><strong>Source Trust &amp; Reliability (R)</strong></td>
+                <td>15%</td>
+                <td>NDRF / District Magistrate bulletins (100%), verified medics (85%), multi-citizen (65%), social media (40%).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tier-rules-box">
+          <h4>Priority Tiers</h4>
+          <ul>
+            <li><span class="badge-critical">CRITICAL (&ge; 75%)</span>: Immediate amphibious/air rescue deployment within 45 minutes.</li>
+            <li><span class="badge-high">HIGH (50&ndash;74%)</span>: Perimeter stabilization, medical triage convoy dispatched within 2 hours.</li>
+            <li><span class="badge-moderate">MODERATE (25&ndash;49%)</span>: Relief supply distribution, water purification, 4-hour check-ins.</li>
+          </ul>
+        </div>
+
+        <button class="btn-primary-close" onclick="document.getElementById('explain-modal').classList.remove('modal-visible')">
+          Understood &times;
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container for Notifications -->
+  <div id="toast-container" class="toast-stack" aria-live="polite"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- AapdaSetu JavaScript Modules -->
+  <script src="js/priority-engine.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
