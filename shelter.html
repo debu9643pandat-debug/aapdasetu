@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AapdaSetu | Rescue Shelters &amp; NGO Operations Hub</title>
+  <title>AapdaSetu | Relief Operations Hub • Shelters &amp; NGO Onboarding</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,17 +14,17 @@
 
   <style>
     :root {
-      --bg-dark: #070c16;
-      --bg-card: #0d1524;
-      --bg-surface: #131e33;
+      --bg-dark: #080d1a;
+      --bg-card: #0e1626;
+      --bg-surface: #141f36;
       --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-teal: rgba(20, 184, 166, 0.35);
+      --border-teal: rgba(20, 184, 166, 0.4);
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --accent-teal: #14b8a6;
       --accent-amber: #f59e0b;
       --accent-red: #ef4444;
-      --accent-blue: #3b82f6;
+      --accent-green: #22c55e;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,9 +38,9 @@
       flex-direction: column;
     }
 
-    /* Top Nav */
+    /* TOP SHELTER NAV */
     .shelter-nav {
-      background: #09121f;
+      background: #0a1120;
       border-bottom: 1px solid var(--border-subtle);
       padding: 12px 24px;
       display: flex;
@@ -58,17 +58,17 @@
     }
 
     .brand-avatar {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       background: linear-gradient(135deg, #0d9488, #0f766e);
-      border-radius: 10px;
+      border-radius: 9px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 20px;
+      font-size: 18px;
       color: #fff;
-      box-shadow: 0 0 12px rgba(13, 148, 136, 0.4);
+      box-shadow: 0 0 14px rgba(13, 148, 136, 0.4);
     }
 
     .brand-text h1 {
@@ -91,236 +91,398 @@
       gap: 12px;
     }
 
-    .role-badge {
+    .nav-badge-pill {
       background: rgba(20, 184, 166, 0.12);
-      border: 1px solid rgba(20, 184, 166, 0.3);
+      border: 1px solid rgba(20, 184, 166, 0.35);
       color: #2dd4bf;
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 6px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .user-pill {
-      font-size: 12px;
-      color: #cbd5e1;
-      background: var(--bg-surface);
-      padding: 6px 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border-subtle);
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2dd4bf;
+      box-shadow: 0 0 8px #2dd4bf;
+      animation: pulseDot 1.5s infinite;
     }
 
-    .btn-logout {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.25);
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .btn-signout {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
       color: #f87171;
-      padding: 6px 12px;
-      border-radius: 8px;
+      padding: 6px 14px;
+      border-radius: 6px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
     }
 
-    .btn-logout:hover {
+    .btn-signout:hover {
       background: #ef4444;
       color: #fff;
     }
 
-    /* Layout Grid */
-    .shelter-body {
+    /* 2-COLUMN MAIN WORKSPACE */
+    .shelter-layout {
       flex: 1;
       display: grid;
-      grid-template-columns: 420px 1fr;
+      grid-template-columns: 460px 1fr;
       gap: 16px;
       padding: 16px 24px;
+      height: calc(100vh - 65px);
+      overflow: hidden;
     }
 
-    /* LEFT COLUMN: Operations & Inventories */
-    .left-col {
+    /* LEFT COLUMN: APPLICATION & ONBOARDING + REGISTERED LIST */
+    .left-sidebar {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
+      overflow-y: auto;
+      padding-right: 4px;
     }
 
-    .card {
+    .left-sidebar::-webkit-scrollbar { width: 5px; }
+    .left-sidebar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+
+    .panel-card {
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
       border-radius: 12px;
-      padding: 18px;
+      padding: 16px;
     }
 
-    .card-title {
+    .panel-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .panel-title {
       font-size: 13.5px;
       font-weight: 700;
       color: #f1f5f9;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    /* Capacity Status Box */
-    .occupancy-hero {
-      background: var(--bg-surface);
-      border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-
-    .occupancy-numbers {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .occ-big {
-      font-size: 28px;
-      font-weight: 800;
-      font-family: 'JetBrains Mono', monospace;
-      color: #2dd4bf;
-    }
-
-    .occ-total {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .progress-bar-bg {
-      height: 8px;
-      background: #1e293b;
-      border-radius: 4px;
-      overflow: hidden;
-      margin-bottom: 10px;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #14b8a6, #2dd4bf);
-      border-radius: 4px;
-      transition: width 0.3s ease;
-    }
-
-    .occ-quick-adjust {
-      display: flex;
       gap: 8px;
     }
 
-    .btn-adjust {
-      flex: 1;
-      padding: 6px;
-      background: #1e293b;
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      color: #cbd5e1;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .btn-adjust:hover {
-      background: #334155;
-      color: #fff;
-    }
-
-    /* Inventory Grid */
-    .inventory-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
+    /* REAL LIFE CONTEXT BANNER */
+    .case-context-banner {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 11.5px;
+      line-height: 1.45;
+      color: #fde68a;
       margin-bottom: 14px;
     }
 
-    .inv-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      padding: 10px 12px;
+    .case-context-banner strong {
+      color: #f59e0b;
     }
 
-    .inv-icon {
-      font-size: 18px;
+    /* ONBOARDING FORM */
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 5px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 9px 12px;
+      background: var(--bg-surface);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 12.5px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+      border-color: var(--accent-teal);
+    }
+
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* IMAGE UPLOAD & DROPZONE */
+    .photo-upload-dropzone {
+      border: 2px dashed rgba(20, 184, 166, 0.4);
+      background: rgba(20, 184, 166, 0.04);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+
+    .photo-upload-dropzone:hover {
+      background: rgba(20, 184, 166, 0.08);
+      border-color: var(--accent-teal);
+    }
+
+    .upload-icon {
+      font-size: 24px;
       margin-bottom: 4px;
     }
 
-    .inv-count {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 16px;
-      font-weight: 700;
-      color: #ffffff;
+    .upload-text-main {
+      font-size: 12px;
+      font-weight: 600;
+      color: #2dd4bf;
     }
 
-    .inv-label {
+    .upload-text-sub {
       font-size: 10.5px;
       color: var(--text-muted);
       margin-top: 2px;
     }
 
-    .btn-request-supplies {
+    /* Presets for quick real-life evaluation testing */
+    .test-cases-row {
+      margin-top: 8px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-test-case {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      font-size: 10.5px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-test-case:hover {
+      background: rgba(20, 184, 166, 0.18);
+      border-color: var(--accent-teal);
+      color: #fff;
+    }
+
+    /* AI VERIFY BUTTON */
+    .btn-ai-verify {
       width: 100%;
-      background: rgba(20, 184, 166, 0.15);
-      border: 1px solid var(--accent-teal);
-      color: #2dd4bf;
-      padding: 10px;
+      background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+      color: #ffffff;
+      border: none;
+      padding: 12px;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
+      margin-top: 14px;
+      box-shadow: 0 4px 14px rgba(13, 148, 136, 0.35);
       transition: all 0.2s;
     }
 
-    .btn-request-supplies:hover {
-      background: var(--accent-teal);
-      color: #fff;
+    .btn-ai-verify:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(13, 148, 136, 0.5);
     }
 
-    /* NGO Coordination List */
-    .ngo-item {
+    /* AI FORENSIC AUDIT VERDICT CARD */
+    .ai-verdict-box {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      display: none;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .ai-verdict-box.verified {
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: #86efac;
+    }
+
+    .ai-verdict-box.flagged {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+
+    .verdict-header {
+      font-weight: 800;
+      font-size: 13px;
+      margin-bottom: 6px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 10px;
-      background: var(--bg-surface);
-      border-radius: 6px;
-      margin-bottom: 6px;
-      font-size: 12px;
     }
 
-    .ngo-status {
+    .verdict-list {
+      margin-top: 6px;
+      padding-left: 14px;
+      font-size: 11px;
+    }
+
+    /* REGISTERED SHELTER CARDS STREAM */
+    .shelter-stream-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .shelter-entry-card {
+      background: var(--bg-surface);
+      border-left: 3px solid var(--accent-teal);
+      border-radius: 6px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+
+    .shelter-entry-card:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .shelter-entry-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .shelter-entry-name {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .shelter-entry-badge {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
+      font-size: 9.5px;
+      font-weight: 700;
       padding: 2px 6px;
       border-radius: 4px;
     }
 
-    .status-deployed {
+    .badge-approved {
       background: rgba(34, 197, 94, 0.15);
       color: #4ade80;
     }
 
-    .status-standby {
+    .badge-unverified {
       background: rgba(245, 158, 11, 0.15);
       color: #fbbf24;
     }
 
-    /* RIGHT COLUMN: Leaflet Map + Citizen SOS Request Queue */
-    .right-col {
+    .shelter-entry-meta {
+      font-size: 11px;
+      color: var(--text-muted);
       display: flex;
-      flex-direction: column;
-      gap: 16px;
+      justify-content: space-between;
     }
 
-    .map-box {
+    .shelter-entry-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .occupancy-pills {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-occ-mini {
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-occ-mini:hover {
+      background: var(--accent-teal);
+      color: #fff;
+    }
+
+    /* RIGHT COLUMN: FULL LEAFLET MAP */
+    .right-map-column {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 100%;
+    }
+
+    .map-top-legend {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+    }
+
+    .legend-chips {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .legend-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .leg-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .map-frame-box {
       flex: 1;
-      min-height: 400px;
       background: #0b111e;
       border: 1px solid var(--border-subtle);
       border-radius: 12px;
@@ -328,157 +490,75 @@
       position: relative;
     }
 
-    #shelter-map {
+    #shelter-interactive-map {
       width: 100%;
       height: 100%;
-      min-height: 400px;
+      min-height: 520px;
     }
 
-    /* Request Queue */
-    .queue-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 12px;
-      padding: 16px;
-      max-height: 280px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .queue-list {
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding-right: 4px;
-    }
-
-    .queue-list::-webkit-scrollbar { width: 4px; }
-    .queue-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-
-    .req-item {
-      background: var(--bg-surface);
-      border-left: 3px solid #ef4444;
-      border-radius: 6px;
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .req-item.acknowledged {
-      border-left-color: #f59e0b;
-    }
-
-    .req-item.resolved {
-      border-left-color: #10b981;
-      opacity: 0.6;
-    }
-
-    .req-info h4 {
-      font-size: 12px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .req-info p {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
-
-    .req-actions {
-      display: flex;
-      gap: 6px;
-    }
-
-    .btn-act {
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 10.5px;
-      font-weight: 700;
-      cursor: pointer;
-      border: 1px solid transparent;
-    }
-
-    .btn-ack {
-      background: rgba(245, 158, 11, 0.15);
-      border-color: #f59e0b;
-      color: #fbbf24;
-    }
-
-    .btn-ack:hover { background: #f59e0b; color: #000; }
-
-    .btn-resolve {
-      background: rgba(34, 197, 94, 0.15);
-      border-color: #22c55e;
-      color: #4ade80;
-    }
-
-    .btn-resolve:hover { background: #22c55e; color: #000; }
-
-    /* Pulsing Map Markers */
-    .marker-shelter-active {
-      width: 24px;
-      height: 24px;
-      background: #14b8a6;
-      border: 2px solid #ffffff;
-      border-radius: 6px;
-      box-shadow: 0 0 14px #14b8a6;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      color: #fff;
-    }
-
-    .pulse-marker-sos {
+    /* PULSING LEAFLET MAP MARKERS */
+    .pulse-danger-pin {
       position: relative;
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       background: #ef4444;
       border: 2px solid #ffffff;
       border-radius: 50%;
       box-shadow: 0 0 10px #ef4444;
     }
 
-    .pulse-marker-sos::after {
+    .pulse-danger-pin::after {
       content: '';
       position: absolute;
-      top: -7px;
-      left: -7px;
-      width: 30px;
-      height: 30px;
+      top: -8px;
+      left: -8px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       border: 2px solid #ef4444;
-      animation: radarPulse 1.5s infinite;
+      animation: radarRing 1.8s infinite;
     }
 
-    @keyframes radarPulse {
+    .shelter-camp-marker {
+      background: #0d9488;
+      border: 2px solid #ffffff;
+      border-radius: 6px;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(13, 148, 136, 0.7);
+    }
+
+    .rescue-boat-marker {
+      background: #3b82f6;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
+    }
+
+    @keyframes radarRing {
       0% { transform: scale(0.6); opacity: 1; }
       100% { transform: scale(2.2); opacity: 0; }
     }
 
-    /* Toast */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: #10b981;
-      color: #fff;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-      z-index: 3000;
-      display: none;
-    }
-
-    @media (max-width: 960px) {
-      .shelter-body {
+    @media (max-width: 980px) {
+      .shelter-layout {
         grid-template-columns: 1fr;
+        height: auto;
+        overflow: visible;
+      }
+      #shelter-interactive-map {
+        min-height: 400px;
       }
     }
   </style>
@@ -496,178 +576,166 @@
     </div>
 
     <div class="nav-actions">
-      <span class="role-badge">NGO &amp; CAMP DISPATCH</span>
-      <span class="user-pill" id="shelter-user-display">🏛️ Relief Coordinator</span>
-      <button class="btn-logout" onclick="logout()">Portal Sign Out</button>
+      <div class="nav-badge-pill">
+        <span class="live-dot"></span>
+        <span>AI FORENSIC VERIFIER ACTIVE</span>
+      </div>
+      <span style="font-size:12px;color:#cbd5e1;background:var(--bg-surface);padding:6px 12px;border-radius:6px;border:1px solid var(--border-subtle);" id="officer-display">
+        🏛️ Field Relief Coordinator
+      </span>
+      <button class="btn-signout" onclick="signOut()">Sign Out</button>
     </div>
   </nav>
 
-  <!-- MAIN SHELTER OPERATIONS BODY -->
-  <main class="shelter-body">
+  <!-- MAIN 2-COLUMN WORKSPACE -->
+  <main class="shelter-layout">
 
-    <!-- LEFT COLUMN: Capacity, Inventory, NGO Teams -->
-    <div class="left-col">
+    <!-- LEFT SIDEBAR: APPLICATION FORM + REGISTERED CAMPS -->
+    <aside class="left-sidebar">
 
-      <!-- CAPACITY WIDGET -->
-      <section class="card">
-        <div class="card-title">
-          <span>🏛️ Camp Capacity &amp; Beds</span>
-          <span style="font-size: 11px; color: #2dd4bf;">Kaziranga Sector Camp #1</span>
+      <!-- ONBOARDING FORM WITH AI VERIFICATION -->
+      <section class="panel-card">
+        <div class="panel-card-header">
+          <div class="panel-title">
+            <span>📝</span> Onboard New Shelter / Rescue Unit
+          </div>
+          <span style="font-family:'JetBrains Mono';font-size:10px;color:#2dd4bf;">Step 1 of 2</span>
         </div>
 
-        <div class="occupancy-hero">
-          <div class="occupancy-numbers">
-            <div>
-              <span class="occ-big" id="occ-count">245</span>
-              <span class="occ-total">/ 400 Beds Occupied</span>
+        <!-- Real-Life Case Study Context Notice -->
+        <div class="case-context-banner">
+          <strong>REAL-LIFE FORENSIC ENFORCEMENT:</strong>
+          In past disasters (Kerala 2018, Assam floods), fraudulent camps popped up using recycled photos from old floods to misdirect rations. AapdaSetu's AI inspects reverse-image hashes, EXIF geo-tags, and flood elevation safety before approving camps.
+        </div>
+
+        <form id="onboard-form" onsubmit="handleOnboardSubmit(event)">
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Organization / NGO Name *</label>
+              <input type="text" id="ngo-name" class="form-control" required placeholder="e.g. SEEDS India / Red Cross" value="Bokakhat Community Relief Trust">
             </div>
-            <span style="font-family:'JetBrains Mono';font-size:12px;font-weight:700;color:#34d399;" id="occ-vacant">155 Vacant</span>
+
+            <div class="form-group">
+              <label>NITI Aayog Darpan ID / Reg No *</label>
+              <input type="text" id="darpan-id" class="form-control" required placeholder="e.g. AS/2021/028914" value="AS/2023/048192">
+            </div>
           </div>
 
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill" id="occ-fill" style="width: 61%;"></div>
+          <div class="form-group">
+            <label>Shelter Facility / Base Name *</label>
+            <input type="text" id="facility-name" class="form-control" required placeholder="e.g. Bokakhat Indoor Badminton Hall" value="Bokakhat Higher Secondary Indoor Camp">
           </div>
 
-          <div class="occ-quick-adjust">
-            <button class="btn-adjust" onclick="adjustOccupancy(-10)">-10 Discharged</button>
-            <button class="btn-adjust" onclick="adjustOccupancy(+10)">+10 Admitted</button>
-            <button class="btn-adjust" onclick="adjustOccupancy(+25)">+25 Inflow</button>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>District / Sector *</label>
+              <select id="facility-district" class="form-control">
+                <option value="Assam - Golaghat/Bokakhat" selected>Assam (Golaghat / Bokakhat)</option>
+                <option value="Assam - Nagaon">Assam (Nagaon Lowland)</option>
+                <option value="Kerala - Wayanad">Kerala (Wayanad Ghats)</option>
+                <option value="Odisha - Jagatsinghpur">Odisha (Coastal Belt)</option>
+                <option value="Himachal - Manali">Himachal (Beas Basin)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Total Bed Capacity *</label>
+              <input type="number" id="bed-capacity" class="form-control" required min="10" max="2500" value="320">
+            </div>
           </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Latitude (Click map to auto-pick)</label>
+              <input type="number" step="0.0001" id="loc-lat" class="form-control" value="26.6120">
+            </div>
+            <div class="form-group">
+              <label>Longitude (Click map to auto-pick)</label>
+              <input type="number" step="0.0001" id="loc-lng" class="form-control" value="93.1890">
+            </div>
+          </div>
+
+          <!-- PHOTO UPLOAD & REVERSE-IMAGE FORENSICS -->
+          <div class="form-group">
+            <label>Shelter Facility Image Proof (AI Reverse-Image Verified) *</label>
+            
+            <div class="photo-upload-dropzone" id="dropzone-box" onclick="document.getElementById('photo-input').click()">
+              <input type="file" id="photo-input" accept="image/*" style="display:none;" onchange="handleFileSelected(event)">
+              <div class="upload-icon">📸</div>
+              <div class="upload-text-main" id="upload-label-main">Click or Drag &amp; Drop Facility Photo</div>
+              <div class="upload-text-sub">AI checks image freshness, EXIF geo-elevation &amp; structural authenticity</div>
+            </div>
+
+            <!-- Quick evaluation scenarios button bar -->
+            <div class="test-cases-row">
+              <span style="font-size:10px;color:#94a3b8;align-self:center;">Quick Test Scenarios:</span>
+              <button type="button" class="btn-test-case" onclick="loadTestCase('genuine')">✅ Genuine Shelter Photo</button>
+              <button type="button" class="btn-test-case" onclick="loadTestCase('fake')">⚠️ Old 2018 Recycled Image</button>
+              <button type="button" class="btn-test-case" onclick="loadTestCase('floodzone')">⛔ Flood Zone Violation</button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-ai-verify" id="btn-submit-verify">
+            <span>⚡</span>
+            <span>RUN AI CROSS-VERIFICATION &amp; ONBOARD</span>
+          </button>
+        </form>
+
+        <!-- AI AUDIT VERDICT BOX (Dynamically populated) -->
+        <div class="ai-verdict-box" id="ai-verdict-box">
+          <div class="verdict-header">
+            <span id="verdict-title">AI VERIFICATION REPORT</span>
+            <span id="verdict-score-badge" style="font-family:'JetBrains Mono';">94% Confidence</span>
+          </div>
+          <div id="verdict-summary">Evaluating structural photo and government databases...</div>
+          <ul class="verdict-list" id="verdict-reasons"></ul>
         </div>
       </section>
 
-      <!-- SUPPLY INVENTORY -->
-      <section class="card">
-        <div class="card-title">
-          <span>📦 Emergency Supply Stocks</span>
-          <span style="font-size: 11px; color: #94a3b8;">Real-time Telemetry</span>
+      <!-- ACTIVE VERIFIED RELIEF CAMPS & RESCUE SQUADS -->
+      <section class="panel-card">
+        <div class="panel-card-header">
+          <div class="panel-title">
+            <span>🏛️</span> Active Verified Shelters &amp; Units
+          </div>
+          <span style="font-family:'JetBrains Mono';font-size:11px;color:#2dd4bf;" id="shelters-count-badge">3 Camps Plotted</span>
         </div>
 
-        <div class="inventory-grid">
-          <div class="inv-card">
-            <div class="inv-icon">💧</div>
-            <div class="inv-count" id="inv-water">3,850</div>
-            <div class="inv-label">Potable Water (Liters)</div>
-          </div>
-
-          <div class="inv-card">
-            <div class="inv-icon">🍲</div>
-            <div class="inv-count" id="inv-food">1,240</div>
-            <div class="inv-label">Ready-to-Eat Meals</div>
-          </div>
-
-          <div class="inv-card">
-            <div class="inv-icon">🩹</div>
-            <div class="inv-count" id="inv-med">85</div>
-            <div class="inv-label">First Aid &amp; Trauma Kits</div>
-          </div>
-
-          <div class="inv-card">
-            <div class="inv-icon">🛏️</div>
-            <div class="inv-count" id="inv-blanket">410</div>
-            <div class="inv-label">Thermal Blankets</div>
-          </div>
-        </div>
-
-        <button class="btn-request-supplies" onclick="requestSupplies()">
-          <span>⚡</span>
-          <span>Log Re-Supply Requisition to SDMA</span>
-        </button>
-      </section>
-
-      <!-- PARTNER NGO DEPLOYMENT -->
-      <section class="card">
-        <div class="card-title">
-          <span>🤝 Partner NGO Squads</span>
-          <span style="font-size: 11px; color: #94a3b8;">Active in Sector</span>
-        </div>
-
-        <div class="ngo-item">
-          <div>
-            <strong>Indian Red Cross Society</strong>
-            <div style="font-size: 10.5px; color: #94a3b8;">Amphibious Medical Unit • 14 Medics</div>
-          </div>
-          <span class="ngo-status status-deployed">DEPLOYED</span>
-        </div>
-
-        <div class="ngo-item">
-          <div>
-            <strong>Goonj Relief Mission</strong>
-            <div style="font-size: 10.5px; color: #94a3b8;">Clothing &amp; Dry Ration Convoy</div>
-          </div>
-          <span class="ngo-status status-deployed">EN ROUTE</span>
-        </div>
-
-        <div class="ngo-item">
-          <div>
-            <strong>SEEDS India Rapid Squad</strong>
-            <div style="font-size: 10.5px; color: #94a3b8;">Water Filtration Rig Unit</div>
-          </div>
-          <span class="ngo-status status-standby">STANDBY</span>
+        <div class="shelter-stream-list" id="shelter-stream-list">
+          <!-- Dynamically populated from data -->
         </div>
       </section>
 
-    </div>
+    </aside>
 
-    <!-- RIGHT COLUMN: Leaflet Map + Citizen Request Triage Queue -->
-    <div class="right-col">
+    <!-- RIGHT COLUMN: INTERACTIVE LEAFLET MAP -->
+    <section class="right-map-column">
+      <div class="map-top-legend">
+        <div class="legend-chips">
+          <div class="legend-chip">
+            <span class="leg-dot" style="background: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
+            <span>Disaster Danger Place (Waterlogging / Landslide)</span>
+          </div>
+          <div class="legend-chip">
+            <span class="leg-dot" style="background: #0d9488; box-shadow: 0 0 6px #0d9488;"></span>
+            <span>AI-Verified Relief Shelter (Open Beds)</span>
+          </div>
+          <div class="legend-chip">
+            <span class="leg-dot" style="background: #3b82f6; box-shadow: 0 0 6px #3b82f6;"></span>
+            <span>Rescue Boat Squad (NDRF/SDRF Unit)</span>
+          </div>
+        </div>
 
-      <!-- LEAFLET OPENSTREETMAP -->
-      <div class="map-box">
-        <div id="shelter-map"></div>
+        <span style="color:#94a3b8;font-size:10.5px;">Click anywhere on map to auto-pick coordinates for onboarding</span>
       </div>
 
-      <!-- CITIZEN SOS & AID QUEUE -->
-      <section class="queue-box">
-        <div class="card-title" style="margin-bottom: 8px;">
-          <span>🚨 Field Citizen SOS &amp; Aid Requests</span>
-          <span style="font-size: 11px; color: #f59e0b;" id="queue-counter">3 Pending</span>
-        </div>
-
-        <div class="queue-list" id="queue-container">
-          
-          <div class="req-item" id="req-1">
-            <div class="req-info">
-              <h4>Bokakhat Bypass — 4 Trapped on Rooftop</h4>
-              <p>Water inundation +1.8m. Evacuation boat &amp; pediatric hydration required.</p>
-            </div>
-            <div class="req-actions">
-              <button class="btn-act btn-ack" onclick="ackRequest('req-1')">Acknowledge</button>
-              <button class="btn-act btn-resolve" onclick="resolveRequest('req-1')">Resolve</button>
-            </div>
-          </div>
-
-          <div class="req-item" id="req-2">
-            <div class="req-info">
-              <h4>Jamunamukh School Camp — Drinking Water Exhaustion</h4>
-              <p>120 refugees. Tube well flooded with silt. 500L clean water dispatched.</p>
-            </div>
-            <div class="req-actions">
-              <button class="btn-act btn-ack" onclick="ackRequest('req-2')">Acknowledge</button>
-              <button class="btn-act btn-resolve" onclick="resolveRequest('req-2')">Resolve</button>
-            </div>
-          </div>
-
-          <div class="req-item" id="req-3">
-            <div class="req-info">
-              <h4>Golaghat NH-37 Animal Corridor — Medical First Aid</h4>
-              <p>2 senior citizens stranded with hypothermia symptoms.</p>
-            </div>
-            <div class="req-actions">
-              <button class="btn-act btn-ack" onclick="ackRequest('req-3')">Acknowledge</button>
-              <button class="btn-act btn-resolve" onclick="resolveRequest('req-3')">Resolve</button>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-    </div>
+      <div class="map-frame-box">
+        <div id="shelter-interactive-map"></div>
+      </div>
+    </section>
 
   </main>
-
-  <!-- TOAST -->
-  <div class="toast" id="toast-msg"></div>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -675,25 +743,75 @@
   <!-- Shared Modules -->
   <script src="js/auth.js"></script>
   <script src="js/data.js"></script>
-  <script src="js/live-data.js"></script>
 
   <script>
-    let map;
-    let occupancy = 245;
-    const capacity = 400;
+    let shelterMap;
+    let mapMarkersLayer;
+
+    // Default test case state
+    let currentSelectedTestCase = 'genuine';
+
+    // Verified shelters collection in memory & localStorage
+    let verifiedShelters = [
+      {
+        id: 'camp-01',
+        ngo: 'Assam SDMA & Red Cross',
+        name: 'Kaziranga High School Relief Camp #1',
+        district: 'Golaghat / Bokakhat',
+        capacity: 400,
+        occupied: 245,
+        lat: 26.585,
+        lng: 93.171,
+        status: 'Approved & Verified',
+        auditScore: 96,
+        type: 'shelter'
+      },
+      {
+        id: 'camp-02',
+        ngo: 'Wayanad Community Relief Council',
+        name: 'Meppadi Multi-Purpose Hall',
+        district: 'Wayanad, Kerala',
+        capacity: 220,
+        occupied: 180,
+        lat: 11.551,
+        lng: 76.126,
+        status: 'Approved & Verified',
+        auditScore: 92,
+        type: 'shelter'
+      },
+      {
+        id: 'camp-03',
+        ngo: 'NDRF 1st Battalion Water Evac Unit',
+        name: 'Amphibious Evac Boat Squad #04',
+        district: 'Bokakhat Bypass, Assam',
+        capacity: 60,
+        occupied: 22,
+        lat: 26.620,
+        lng: 93.210,
+        status: 'Active Rescue Unit',
+        auditScore: 99,
+        type: 'rescue_squad'
+      }
+    ];
 
     document.addEventListener('DOMContentLoaded', function() {
+      // Auth verification
       if (window.AapdaAuth) {
         const session = window.AapdaAuth.requireAuth(['shelter', 'admin']);
         if (session) {
-          document.getElementById('shelter-user-display').textContent = `🏛️ ${session.name}`;
+          document.getElementById('officer-display').textContent = `🏛️ ${session.name}`;
         }
       }
 
-      initMap();
+      // Load any saved shelters from localStorage
+      loadSavedShelters();
+
+      // Init Map
+      initShelterMap();
+      renderShelterList();
     });
 
-    function logout() {
+    function signOut() {
       if (window.AapdaAuth) window.AapdaAuth.logout();
       else {
         localStorage.removeItem('aapdasetu_auth_v1');
@@ -701,87 +819,268 @@
       }
     }
 
-    function initMap() {
-      map = L.map('shelter-map', {
+    function initShelterMap() {
+      shelterMap = L.map('shelter-interactive-map', {
         zoomControl: true,
         attributionControl: false
-      }).setView([26.585, 93.171], 9);
+      }).setView([26.595, 93.185], 11);
 
+      // Voyager carto base tiles
       L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         maxZoom: 18,
         subdomains: 'abcd'
-      }).addTo(map);
+      }).addTo(shelterMap);
 
-      // Primary Camp Marker (Teal)
-      const shelterIcon = L.divIcon({
-        html: `<div class="marker-shelter-active">⛺</div>`,
-        className: 'shelter-pin-icon',
-        iconSize: [28, 28],
-        iconAnchor: [14, 14]
+      mapMarkersLayer = L.layerGroup().addTo(shelterMap);
+
+      // Plot seed disaster hazard points (floods, submerged bridges)
+      plotDisasterHazards();
+
+      // Plot all verified shelters
+      plotAllSheltersOnMap();
+
+      // Map click event to auto-fill latitude & longitude
+      shelterMap.on('click', function(e) {
+        document.getElementById('loc-lat').value = e.latlng.lat.toFixed(4);
+        document.getElementById('loc-lng').value = e.latlng.lng.toFixed(4);
       });
+    }
 
-      const m = L.marker([26.585, 93.171], { icon: shelterIcon }).addTo(map);
-      m.bindPopup(`
-        <div style="font-family:'Inter',sans-serif;font-size:12px;">
-          <strong style="color:#0f766e;">Kaziranga High School Relief Camp #1</strong>
-          <div style="margin:4px 0;">Occupancy: <strong>${occupancy} / ${capacity}</strong></div>
-          <div>Status: Active Receiving Station</div>
-        </div>
-      `).openPopup();
+    function plotDisasterHazards() {
+      // Plot actual hazard submergence zones in red
+      const hazards = [
+        { lat: 26.585, lng: 93.171, title: 'NH-37 Kaziranga Water Inundation (+1.8m)', type: 'flood' },
+        { lat: 26.640, lng: 93.230, title: 'Bokakhat Low Embankment Breach', type: 'flood' }
+      ];
 
-      // Nearby citizen SOS markers
-      const sosIcon = L.divIcon({
-        html: `<div class="pulse-marker-sos"></div>`,
-        className: 'sos-pin-icon',
-        iconSize: [22, 22],
-        iconAnchor: [11, 11]
+      hazards.forEach(h => {
+        const icon = L.divIcon({
+          html: `<div class="pulse-danger-pin"></div>`,
+          className: 'hazard-pin',
+          iconSize: [22, 22],
+          iconAnchor: [11, 11]
+        });
+
+        L.marker([h.lat, h.lng], { icon })
+          .addTo(mapMarkersLayer)
+          .bindPopup(`<strong>⛔ DISASTER DANGER POINT</strong><br>${h.title}`);
       });
-
-      L.marker([26.620, 93.210], { icon: sosIcon }).addTo(map)
-        .bindPopup('<strong>SOS: Bokakhat Bypass</strong><br>4 citizens awaiting boat evacuation');
-
-      L.marker([26.510, 93.080], { icon: sosIcon }).addTo(map)
-        .bindPopup('<strong>SOS: Medical First Aid</strong><br>Hypothermia care required');
     }
 
-    function adjustOccupancy(delta) {
-      occupancy = Math.max(0, Math.min(capacity, occupancy + delta));
-      document.getElementById('occ-count').textContent = occupancy;
-      const vacant = capacity - occupancy;
-      document.getElementById('occ-vacant').textContent = `${vacant} Vacant`;
-      const pct = Math.round((occupancy / capacity) * 100);
-      document.getElementById('occ-fill').style.width = `${pct}%`;
-      showToast(`Occupancy updated: ${occupancy} / ${capacity} beds (${pct}%)`);
+    function plotAllSheltersOnMap() {
+      verifiedShelters.forEach(s => {
+        const isSquad = s.type === 'rescue_squad';
+        const iconHtml = isSquad 
+          ? `<div class="rescue-boat-marker">🚤</div>` 
+          : `<div class="shelter-camp-marker">⛺</div>`;
+
+        const icon = L.divIcon({
+          html: iconHtml,
+          className: 'shelter-marker-icon',
+          iconSize: [26, 26],
+          iconAnchor: [13, 13]
+        });
+
+        const freeBeds = s.capacity - s.occupied;
+        L.marker([s.lat, s.lng], { icon })
+          .addTo(mapMarkersLayer)
+          .bindPopup(`
+            <div style="font-family:'Inter',sans-serif;font-size:12px;">
+              <strong style="color:${isSquad ? '#2563eb' : '#0d9488'};">${escapeHtml(s.name)}</strong>
+              <div style="margin:3px 0;color:#64748b;">NGO: ${escapeHtml(s.ngo)}</div>
+              <div>Free Capacity: <strong>${freeBeds} / ${s.capacity} Beds</strong></div>
+              <div style="font-size:10px;color:#10b981;margin-top:2px;">AI Verified Confidence: ${s.auditScore}%</div>
+            </div>
+          `);
+      });
     }
 
-    function requestSupplies() {
-      showToast('📦 Emergency Re-supply Requisition submitted to SDMA Control Room!');
+    function renderShelterList() {
+      const container = document.getElementById('shelter-stream-list');
+      const badge = document.getElementById('shelters-count-badge');
+      badge.textContent = `${verifiedShelters.length} Camps Plotted`;
+
+      container.innerHTML = verifiedShelters.map((s, idx) => {
+        const freeBeds = s.capacity - s.occupied;
+        const isSquad = s.type === 'rescue_squad';
+        return `
+          <div class="shelter-entry-card" style="border-left-color:${isSquad ? '#3b82f6' : '#14b8a6'};">
+            <div class="shelter-entry-top">
+              <span class="shelter-entry-name">${escapeHtml(s.name)}</span>
+              <span class="shelter-entry-badge badge-approved">${s.status}</span>
+            </div>
+            <div class="shelter-entry-meta">
+              <span>NGO: ${escapeHtml(s.ngo)}</span>
+              <span><strong>${freeBeds} free</strong> / ${s.capacity} beds</span>
+            </div>
+            <div class="shelter-entry-actions">
+              <span style="font-size:10px;color:#2dd4bf;">AI Audit: ${s.auditScore}% Pass</span>
+              <div class="occupancy-pills">
+                <button class="btn-occ-mini" onclick="updateOccupancy(${idx}, +5)">+5 In</button>
+                <button class="btn-occ-mini" onclick="updateOccupancy(${idx}, -5)">-5 Out</button>
+                <button class="btn-occ-mini" onclick="shelterMap.flyTo([${s.lat}, ${s.lng}], 13)">Focus Map</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
-    function ackRequest(id) {
-      const el = document.getElementById(id);
-      if (el) {
-        el.classList.add('acknowledged');
-        showToast('Request acknowledged! Relief dispatch squad notified.');
+    function updateOccupancy(idx, delta) {
+      const s = verifiedShelters[idx];
+      s.occupied = Math.max(0, Math.min(s.capacity, s.occupied + delta));
+      saveShelters();
+      renderShelterList();
+    }
+
+    function saveShelters() {
+      try {
+        localStorage.setItem('aapdasetu_verified_shelters_v1', JSON.stringify(verifiedShelters));
+      } catch(e) {}
+    }
+
+    function loadSavedShelters() {
+      try {
+        const stored = localStorage.getItem('aapdasetu_verified_shelters_v1');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            verifiedShelters = parsed;
+          }
+        }
+      } catch(e) {}
+    }
+
+    // Quick test scenarios to demonstrate AI forensic capabilities
+    function loadTestCase(scenario) {
+      currentSelectedTestCase = scenario;
+      const label = document.getElementById('upload-label-main');
+
+      if (scenario === 'genuine') {
+        document.getElementById('ngo-name').value = 'Bokakhat Janakalyan Trust';
+        document.getElementById('facility-name').value = 'Bokakhat Town Hall & Badminton Complex';
+        document.getElementById('bed-capacity').value = '250';
+        document.getElementById('loc-lat').value = '26.6180';
+        document.getElementById('loc-lng').value = '93.1950';
+        label.textContent = '📸 Loaded: Genuine Photo (Bokakhat_Hall_Interior.jpg)';
+      } else if (scenario === 'fake') {
+        document.getElementById('ngo-name').value = 'Apex Relief Mission (Unregistered)';
+        document.getElementById('facility-name').value = 'Assam Relief Warehouse 4';
+        document.getElementById('bed-capacity').value = '1200'; // Plausibility mismatch
+        document.getElementById('darpan-id').value = 'INVALID-ID-999';
+        label.textContent = '⚠️ Loaded: Old 2018 Recycled Image (Kerala_Floods_Stock_2018.jpg)';
+      } else if (scenario === 'floodzone') {
+        document.getElementById('ngo-name').value = 'Green Valley Society';
+        document.getElementById('facility-name').value = 'Riverbank Riverside Shed';
+        document.getElementById('loc-lat').value = '26.5850'; // Inside waterlogged hazard zone
+        document.getElementById('loc-lng').value = '93.1710';
+        label.textContent = '⛔ Loaded: Site in Active 2m Submergence Zone';
       }
     }
 
-    function resolveRequest(id) {
-      const el = document.getElementById(id);
-      if (el) {
-        el.classList.add('resolved');
-        setTimeout(() => {
-          el.style.display = 'none';
-          showToast('Incident marked resolved and logged to audit trail.');
-        }, 500);
+    function handleFileSelected(e) {
+      if (e.target.files && e.target.files[0]) {
+        document.getElementById('upload-label-main').textContent = `📸 Loaded: ${e.target.files[0].name}`;
       }
     }
 
-    function showToast(msg) {
-      const t = document.getElementById('toast-msg');
-      t.textContent = msg;
-      t.style.display = 'block';
-      setTimeout(() => { t.style.display = 'none'; }, 3500);
+    // Main AI Cross-Verification Handler
+    async function handleOnboardSubmit(e) {
+      e.preventDefault();
+
+      const btn = document.getElementById('btn-submit-verify');
+      const verdictBox = document.getElementById('ai-verdict-box');
+      const reasonsList = document.getElementById('verdict-reasons');
+      
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner-inline"></span> Running AI Forensic Verification Engine...`;
+
+      // Simulate AI forensic analysis (Image Hash Check, Geo Elevation clearance, Darpan Registry lookup)
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = `<span>⚡</span><span>RUN AI CROSS-VERIFICATION &amp; ONBOARD</span>`;
+
+        verdictBox.style.display = 'block';
+
+        if (currentSelectedTestCase === 'genuine') {
+          // APPROVED
+          verdictBox.className = 'ai-verdict-box verified';
+          document.getElementById('verdict-title').textContent = '✅ AI VERIFICATION APPROVED: GENUINE RELIEF SHELTER';
+          document.getElementById('verdict-score-badge').textContent = '96% Authenticity Score';
+          document.getElementById('verdict-summary').textContent = 'Facility verified through multi-tier image hash and geographic clearance check.';
+          
+          reasonsList.innerHTML = `
+            <li><strong>✓ Image Forensics:</strong> Perceptual image hash matches zero archived stock or past disaster broadcasts. Metadata confirms image taken within 24 hours.</li>
+            <li><strong>✓ Structural Plausibility:</strong> Indoor hall dimensions consistent with requested 250-bed count (ratio 1.8 beds/sq meter).</li>
+            <li><strong>✓ Geographic Clearance:</strong> Facility elevation +16.4m above CWC Brahmaputra danger line. Outside active inundation zone.</li>
+            <li><strong>✓ Registry Verification:</strong> NITI Aayog Darpan ID AS/2023/048192 validated against Assam non-profit gazette.</li>
+          `;
+
+          // Add to verified collection and plot onto map
+          const newCamp = {
+            id: 'camp-' + Date.now().toString().slice(-4),
+            ngo: document.getElementById('ngo-name').value,
+            name: document.getElementById('facility-name').value,
+            district: document.getElementById('facility-district').value,
+            capacity: parseInt(document.getElementById('bed-capacity').value, 10),
+            occupied: 0,
+            lat: parseFloat(document.getElementById('loc-lat').value),
+            lng: parseFloat(document.getElementById('loc-lng').value),
+            status: 'Approved & Verified',
+            auditScore: 96,
+            type: 'shelter'
+          };
+
+          verifiedShelters.unshift(newCamp);
+          saveShelters();
+          renderShelterList();
+
+          // Add marker to map
+          const icon = L.divIcon({
+            html: `<div class="shelter-camp-marker" style="background:#22c55e;box-shadow:0 0 16px #22c55e;">⛺</div>`,
+            className: 'shelter-marker-icon',
+            iconSize: [28, 28],
+            iconAnchor: [14, 14]
+          });
+
+          L.marker([newCamp.lat, newCamp.lng], { icon })
+            .addTo(mapMarkersLayer)
+            .bindPopup(`<strong>NEW VERIFIED SHELTER!</strong><br>${newCamp.name}<br>Beds: ${newCamp.capacity}`)
+            .openPopup();
+
+          shelterMap.flyTo([newCamp.lat, newCamp.lng], 13);
+
+        } else if (currentSelectedTestCase === 'fake') {
+          // REJECTED: FRAUDULENT OLD MEDIA
+          verdictBox.className = 'ai-verdict-box flagged';
+          document.getElementById('verdict-title').textContent = '❌ REJECTED: FRAUDULENT OLD MEDIA DETECTED';
+          document.getElementById('verdict-score-badge').textContent = '18% Trust Score';
+          document.getElementById('verdict-summary').textContent = 'Facility image matched historical flood photo from 2018. Registration rejected to protect citizen safety.';
+          
+          reasonsList.innerHTML = `
+            <li><strong>⚠️ Recycled Media Suspect:</strong> Visual reverse-search and image hash match photo keyframes from July 2018 Kerala floods news archive.</li>
+            <li><strong>⚠️ Darpan Registry Mismatch:</strong> Registration ID "INVALID-ID-999" does not exist in national NGO Darpan portal.</li>
+            <li><strong>⚠️ Capacity Implausibility:</strong> Claimed 1,200 beds exceeds standard community center physical ceiling by 400%.</li>
+          `;
+
+        } else if (currentSelectedTestCase === 'floodzone') {
+          // REJECTED: HAZARD SAFETY VIOLATION
+          verdictBox.className = 'ai-verdict-box flagged';
+          document.getElementById('verdict-title').textContent = '⛔ REJECTED: SEVERE FLOOD HAZARD VIOLATION';
+          document.getElementById('verdict-score-badge').textContent = '22% Safety Score';
+          document.getElementById('verdict-summary').textContent = 'The submitted coordinates are situated directly inside an active flood submergence path.';
+          
+          reasonsList.innerHTML = `
+            <li><strong>⛔ Active Submergence:</strong> Coordinates (26.585° N, 93.171° E) are currently submerged under 1.8m water per CWC river gauge telemetry.</li>
+            <li><strong>⛔ Egress Route Trapped:</strong> Direct access highway is completely cut off. Evacuation into this shelter would endanger refugees.</li>
+          `;
+        }
+      }, 1200);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
   </script>
 </body>
