@@ -198,14 +198,43 @@ window.AapdaApp = (function () {
   function jumpToRegion(region) {
     activeRegion = region;
     if (elements.searchInput) elements.searchInput.value = region;
-    AapdaMap.flyToRegion(region);
 
-    // If region matches any preset, highlight in banner
-    if (elements.sectorLabel) {
-      elements.sectorLabel.textContent = `Sector: ${region} Operations Zone`;
+    // Highlight the active quick jump button
+    if (elements.quickJumps) {
+      elements.quickJumps.forEach(btn => {
+        const btnReg = btn.getAttribute('data-region') || '';
+        if (btnReg.toLowerCase() === region.toLowerCase()) {
+          btn.classList.add('active-jump');
+        } else {
+          btn.classList.remove('active-jump');
+        }
+      });
     }
 
-    showToast(`Navigated to ${region} Disaster Sector`, 'info');
+    // Find the primary incident representing this region
+    const regionIncident = incidents.find(i => 
+      (i.region && i.region.toLowerCase() === region.toLowerCase()) ||
+      (i.sector && i.sector.toLowerCase().includes(region.toLowerCase()))
+    );
+
+    if (regionIncident) {
+      selectedIncidentId = regionIncident.id;
+      if (elements.sectorLabel) {
+        elements.sectorLabel.textContent = `Sector: ${regionIncident.sector}`;
+      }
+    } else {
+      if (elements.sectorLabel) {
+        elements.sectorLabel.textContent = `Sector: ${region} Operations Zone`;
+      }
+    }
+
+    // Fly camera on Leaflet map
+    AapdaMap.flyToRegion(region);
+
+    // Re-render ALL panels so telemetry and feed immediately update!
+    renderAll();
+
+    showToast(`Navigated to ${region} Disaster Sector (Telemetry synced)`, 'info');
   }
 
   function handleSearchJump(query) {
@@ -223,13 +252,15 @@ window.AapdaApp = (function () {
       i.region.toLowerCase().includes(q)
     );
     if (found) {
-      selectIncident(found.id);
+      selectedIncidentId = found.id;
+      activeRegion = found.region || 'Assam';
       AapdaMap.flyToIncident(found);
+      renderAll();
     }
   }
 
   function getFilteredIncidents() {
-    return incidents.filter(inc => {
+    const list = incidents.filter(inc => {
       // Category / Status Filter
       if (activeFilter === 'hazard' && inc.category !== 'hazard') return false;
       if (activeFilter === 'shelter' && inc.category !== 'shelter') return false;
@@ -246,6 +277,20 @@ window.AapdaApp = (function () {
 
       return true;
     });
+
+    // If a region is active, prioritize its incidents at the top
+    if (activeRegion && activeRegion.toLowerCase() !== 'all') {
+      const regLow = activeRegion.toLowerCase();
+      list.sort((a, b) => {
+        const aMatches = (a.region && a.region.toLowerCase() === regLow) || (a.sector && a.sector.toLowerCase().includes(regLow));
+        const bMatches = (b.region && b.region.toLowerCase() === regLow) || (b.sector && b.sector.toLowerCase().includes(regLow));
+        if (aMatches && !bMatches) return -1;
+        if (!aMatches && bMatches) return 1;
+        return 0;
+      });
+    }
+
+    return list;
   }
 
   function switchView(viewName) {
