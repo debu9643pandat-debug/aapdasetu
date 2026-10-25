@@ -34,6 +34,7 @@ window.AapdaApp = (function () {
 
       // Search & Jump
       searchInput: document.getElementById('search-input'),
+      btnSearchGo: document.getElementById('btn-search-go'),
       quickJumps: document.querySelectorAll('.quick-jump-tag'),
 
       // Telemetry & Co-Pilot
@@ -115,7 +116,17 @@ window.AapdaApp = (function () {
 
       elements.searchInput.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
+          e.preventDefault();
           handleSearchJump(this.value);
+        }
+      });
+    }
+
+    // Search Go Button
+    if (elements.btnSearchGo) {
+      elements.btnSearchGo.addEventListener('click', function () {
+        if (elements.searchInput) {
+          handleSearchJump(elements.searchInput.value);
         }
       });
     }
@@ -237,26 +248,75 @@ window.AapdaApp = (function () {
     showToast(`Navigated to ${region} Disaster Sector (Telemetry synced)`, 'info');
   }
 
-  function handleSearchJump(query) {
-    const q = (query || '').toLowerCase();
+  async function handleSearchJump(query) {
+    if (!query || !query.trim()) return;
+    const raw = query.trim();
+    const q = raw.toLowerCase();
+
+    // 1. Direct match in built-in Indian geography dictionary
     for (const key of Object.keys(AapdaMap.REGION_PRESETS)) {
-      if (key !== 'all' && q.includes(key)) {
+      if (key !== 'all' && (q === key || q.includes(key) || key.includes(q))) {
         jumpToRegion(key.charAt(0).toUpperCase() + key.slice(1));
         return;
       }
     }
-    // Filter incidents
+
+    // 2. Match in local incidents dataset
     const found = incidents.find(i => 
-      i.title.toLowerCase().includes(q) || 
-      i.sector.toLowerCase().includes(q) || 
-      i.region.toLowerCase().includes(q)
+      (i.title && i.title.toLowerCase().includes(q)) || 
+      (i.sector && i.sector.toLowerCase().includes(q)) || 
+      (i.region && i.region.toLowerCase().includes(q))
     );
     if (found) {
       selectedIncidentId = found.id;
       activeRegion = found.region || 'Assam';
       AapdaMap.flyToIncident(found);
       renderAll();
+      showToast(`Found disaster sector: ${found.title}`, 'info');
+      return;
     }
+
+    // 3. Dynamic OpenStreetMap Nominatim Geocoding API for ANY Place in India
+    try {
+      showToast(`Searching OpenStreetMap for "${raw}"...`, 'info');
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&countrycodes=in&limit=1&q=${encodeURIComponent(raw)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.length > 0) {
+          const item = data[0];
+          const lat = parseFloat(item.lat);
+          const lon = parseFloat(item.lon);
+          activeRegion = raw;
+
+          if (elements.sectorLabel) {
+            elements.sectorLabel.textContent = `Sector: ${item.display_name.split(',')[0]} (OSM Geocoded)`;
+          }
+
+          if (window.AapdaMap && window.AapdaMap.map) {
+            window.AapdaMap.map.flyTo([lat, lon], 12, { duration: 1.4 });
+
+            // Drop a search marker
+            const searchIcon = L.divIcon({
+              html: `<div style="width:24px;height:24px;background:#2563eb;border:2px solid #fff;border-radius:50%;box-shadow:0 0 14px #2563eb;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;">📍</div>`,
+              className: 'search-pin-active',
+              iconSize: [24, 24],
+              iconAnchor: [12, 12]
+            });
+            L.marker([lat, lon], { icon: searchIcon })
+              .addTo(window.AapdaMap.map)
+              .bindPopup(`<strong>Searched Place:</strong><br>${item.display_name}`)
+              .openPopup();
+          }
+
+          showToast(`[OSM Search] Focused map on "${raw}" (${lat.toFixed(3)}°, ${lon.toFixed(3)}°)`, 'success');
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn('OSM Geocoding fetch error:', err);
+    }
+
+    showToast(`Could not locate "${raw}". Try major regions like Mumbai, Wayanad, Odisha, or Delhi.`, 'info');
   }
 
   function getFilteredIncidents() {

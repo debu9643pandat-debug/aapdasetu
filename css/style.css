@@ -170,6 +170,26 @@ body.command-center-body {
   color: #9ca3af;
 }
 
+.btn-search-go {
+  background: #2563eb;
+  border: none;
+  border-radius: 4px;
+  color: #ffffff;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  transition: all 0.15s ease;
+}
+
+.btn-search-go:hover {
+  background: #1d4ed8;
+  transform: scale(1.08);
+}
+
 /* Header Right Action Buttons */
 .header-right {
   display: flex;
