@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AapdaSetu | Rescue Shelters &amp; NGO Operations Hub</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+
+  <style>
+    :root {
+      --bg-dark: #070c16;
+      --bg-card: #0d1524;
+      --bg-surface: #131e33;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-teal: rgba(20, 184, 166, 0.35);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-teal: #14b8a6;
+      --accent-amber: #f59e0b;
+      --accent-red: #ef4444;
+      --accent-blue: #3b82f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Nav */
+    .shelter-nav {
+      background: #09121f;
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-avatar {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #0d9488, #0f766e);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      color: #fff;
+      box-shadow: 0 0 12px rgba(13, 148, 136, 0.4);
+    }
+
+    .brand-text h1 {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #2dd4bf;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .role-badge {
+      background: rgba(20, 184, 166, 0.12);
+      border: 1px solid rgba(20, 184, 166, 0.3);
+      color: #2dd4bf;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .user-pill {
+      font-size: 12px;
+      color: #cbd5e1;
+      background: var(--bg-surface);
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-logout {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #f87171;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    /* Layout Grid */
+    .shelter-body {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 16px;
+      padding: 16px 24px;
+    }
+
+    /* LEFT COLUMN: Operations & Inventories */
+    .left-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .card-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* Capacity Status Box */
+    .occupancy-hero {
+      background: var(--bg-surface);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .occupancy-numbers {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .occ-big {
+      font-size: 28px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: #2dd4bf;
+    }
+
+    .occ-total {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .progress-bar-bg {
+      height: 8px;
+      background: #1e293b;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #14b8a6, #2dd4bf);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    .occ-quick-adjust {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-adjust {
+      flex: 1;
+      padding: 6px;
+      background: #1e293b;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      color: #cbd5e1;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-adjust:hover {
+      background: #334155;
+      color: #fff;
+    }
+
+    /* Inventory Grid */
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .inv-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+
+    .inv-icon {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .inv-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .inv-label {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .btn-request-supplies {
+      width: 100%;
+      background: rgba(20, 184, 166, 0.15);
+      border: 1px solid var(--accent-teal);
+      color: #2dd4bf;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-request-supplies:hover {
+      background: var(--accent-teal);
+      color: #fff;
+    }
+
+    /* NGO Coordination List */
+    .ngo-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      background: var(--bg-surface);
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+
+    .ngo-status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .status-deployed {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+    }
+
+    .status-standby {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+    }
+
+    /* RIGHT COLUMN: Leaflet Map + Citizen SOS Request Queue */
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .map-box {
+      flex: 1;
+      min-height: 400px;
+      background: #0b111e;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #shelter-map {
+      width: 100%;
+      height: 100%;
+      min-height: 400px;
+    }
+
+    /* Request Queue */
+    .queue-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+      max-height: 280px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .queue-list {
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+    }
+
+    .queue-list::-webkit-scrollbar { width: 4px; }
+    .queue-list::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+    .req-item {
+      background: var(--bg-surface);
+      border-left: 3px solid #ef4444;
+      border-radius: 6px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .req-item.acknowledged {
+      border-left-color: #f59e0b;
+    }
+
+    .req-item.resolved {
+      border-left-color: #10b981;
+      opacity: 0.6;
+    }
+
+    .req-info h4 {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .req-info p {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .req-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-act {
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .btn-ack {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: #f59e0b;
+      color: #fbbf24;
+    }
+
+    .btn-ack:hover { background: #f59e0b; color: #000; }
+
+    .btn-resolve {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: #22c55e;
+      color: #4ade80;
+    }
+
+    .btn-resolve:hover { background: #22c55e; color: #000; }
+
+    /* Pulsing Map Markers */
+    .marker-shelter-active {
+      width: 24px;
+      height: 24px;
+      background: #14b8a6;
+      border: 2px solid #ffffff;
+      border-radius: 6px;
+      box-shadow: 0 0 14px #14b8a6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #fff;
+    }
+
+    .pulse-marker-sos {
+      position: relative;
+      width: 20px;
+      height: 20px;
+      background: #ef4444;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #ef4444;
+    }
+
+    .pulse-marker-sos::after {
+      content: '';
+      position: absolute;
+      top: -7px;
+      left: -7px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid #ef4444;
+      animation: radarPulse 1.5s infinite;
+    }
+
+    @keyframes radarPulse {
+      0% { transform: scale(0.6); opacity: 1; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #10b981;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      z-index: 3000;
+      display: none;
+    }
+
+    @media (max-width: 960px) {
+      .shelter-body {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAV -->
+  <nav class="shelter-nav">
+    <div class="brand-wrap">
+      <div class="brand-avatar">A</div>
+      <div class="brand-text">
+        <h1>AapdaSetu OS</h1>
+        <span class="brand-badge">RELIEF OPERATIONS HUB • RESCUE SHELTERS &amp; NGOS</span>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <span class="role-badge">NGO &amp; CAMP DISPATCH</span>
+      <span class="user-pill" id="shelter-user-display">🏛️ Relief Coordinator</span>
+      <button class="btn-logout" onclick="logout()">Portal Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- MAIN SHELTER OPERATIONS BODY -->
+  <main class="shelter-body">
+
+    <!-- LEFT COLUMN: Capacity, Inventory, NGO Teams -->
+    <div class="left-col">
+
+      <!-- CAPACITY WIDGET -->
+      <section class="card">
+        <div class="card-title">
+          <span>🏛️ Camp Capacity &amp; Beds</span>
+          <span style="font-size: 11px; color: #2dd4bf;">Kaziranga Sector Camp #1</span>
+        </div>
+
+        <div class="occupancy-hero">
+          <div class="occupancy-numbers">
+            <div>
+              <span class="occ-big" id="occ-count">245</span>
+              <span class="occ-total">/ 400 Beds Occupied</span>
+            </div>
+            <span style="font-family:'JetBrains Mono';font-size:12px;font-weight:700;color:#34d399;" id="occ-vacant">155 Vacant</span>
+          </div>
+
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="occ-fill" style="width: 61%;"></div>
+          </div>
+
+          <div class="occ-quick-adjust">
+            <button class="btn-adjust" onclick="adjustOccupancy(-10)">-10 Discharged</button>
+            <button class="btn-adjust" onclick="adjustOccupancy(+10)">+10 Admitted</button>
+            <button class="btn-adjust" onclick="adjustOccupancy(+25)">+25 Inflow</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SUPPLY INVENTORY -->
+      <section class="card">
+        <div class="card-title">
+          <span>📦 Emergency Supply Stocks</span>
+          <span style="font-size: 11px; color: #94a3b8;">Real-time Telemetry</span>
+        </div>
+
+        <div class="inventory-grid">
+          <div class="inv-card">
+            <div class="inv-icon">💧</div>
+            <div class="inv-count" id="inv-water">3,850</div>
+            <div class="inv-label">Potable Water (Liters)</div>
+          </div>
+
+          <div class="inv-card">
+            <div class="inv-icon">🍲</div>
+            <div class="inv-count" id="inv-food">1,240</div>
+            <div class="inv-label">Ready-to-Eat Meals</div>
+          </div>
+
+          <div class="inv-card">
+            <div class="inv-icon">🩹</div>
+            <div class="inv-count" id="inv-med">85</div>
+            <div class="inv-label">First Aid &amp; Trauma Kits</div>
+          </div>
+
+          <div class="inv-card">
+            <div class="inv-icon">🛏️</div>
+            <div class="inv-count" id="inv-blanket">410</div>
+            <div class="inv-label">Thermal Blankets</div>
+          </div>
+        </div>
+
+        <button class="btn-request-supplies" onclick="requestSupplies()">
+          <span>⚡</span>
+          <span>Log Re-Supply Requisition to SDMA</span>
+        </button>
+      </section>
+
+      <!-- PARTNER NGO DEPLOYMENT -->
+      <section class="card">
+        <div class="card-title">
+          <span>🤝 Partner NGO Squads</span>
+          <span style="font-size: 11px; color: #94a3b8;">Active in Sector</span>
+        </div>
+
+        <div class="ngo-item">
+          <div>
+            <strong>Indian Red Cross Society</strong>
+            <div style="font-size: 10.5px; color: #94a3b8;">Amphibious Medical Unit • 14 Medics</div>
+          </div>
+          <span class="ngo-status status-deployed">DEPLOYED</span>
+        </div>
+
+        <div class="ngo-item">
+          <div>
+            <strong>Goonj Relief Mission</strong>
+            <div style="font-size: 10.5px; color: #94a3b8;">Clothing &amp; Dry Ration Convoy</div>
+          </div>
+          <span class="ngo-status status-deployed">EN ROUTE</span>
+        </div>
+
+        <div class="ngo-item">
+          <div>
+            <strong>SEEDS India Rapid Squad</strong>
+            <div style="font-size: 10.5px; color: #94a3b8;">Water Filtration Rig Unit</div>
+          </div>
+          <span class="ngo-status status-standby">STANDBY</span>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- RIGHT COLUMN: Leaflet Map + Citizen Request Triage Queue -->
+    <div class="right-col">
+
+      <!-- LEAFLET OPENSTREETMAP -->
+      <div class="map-box">
+        <div id="shelter-map"></div>
+      </div>
+
+      <!-- CITIZEN SOS & AID QUEUE -->
+      <section class="queue-box">
+        <div class="card-title" style="margin-bottom: 8px;">
+          <span>🚨 Field Citizen SOS &amp; Aid Requests</span>
+          <span style="font-size: 11px; color: #f59e0b;" id="queue-counter">3 Pending</span>
+        </div>
+
+        <div class="queue-list" id="queue-container">
+          
+          <div class="req-item" id="req-1">
+            <div class="req-info">
+              <h4>Bokakhat Bypass — 4 Trapped on Rooftop</h4>
+              <p>Water inundation +1.8m. Evacuation boat &amp; pediatric hydration required.</p>
+            </div>
+            <div class="req-actions">
+              <button class="btn-act btn-ack" onclick="ackRequest('req-1')">Acknowledge</button>
+              <button class="btn-act btn-resolve" onclick="resolveRequest('req-1')">Resolve</button>
+            </div>
+          </div>
+
+          <div class="req-item" id="req-2">
+            <div class="req-info">
+              <h4>Jamunamukh School Camp — Drinking Water Exhaustion</h4>
+              <p>120 refugees. Tube well flooded with silt. 500L clean water dispatched.</p>
+            </div>
+            <div class="req-actions">
+              <button class="btn-act btn-ack" onclick="ackRequest('req-2')">Acknowledge</button>
+              <button class="btn-act btn-resolve" onclick="resolveRequest('req-2')">Resolve</button>
+            </div>
+          </div>
+
+          <div class="req-item" id="req-3">
+            <div class="req-info">
+              <h4>Golaghat NH-37 Animal Corridor — Medical First Aid</h4>
+              <p>2 senior citizens stranded with hypothermia symptoms.</p>
+            </div>
+            <div class="req-actions">
+              <button class="btn-act btn-ack" onclick="ackRequest('req-3')">Acknowledge</button>
+              <button class="btn-act btn-resolve" onclick="resolveRequest('req-3')">Resolve</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast-msg"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  
+  <!-- Shared Modules -->
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/live-data.js"></script>
+
+  <script>
+    let map;
+    let occupancy = 245;
+    const capacity = 400;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.AapdaAuth) {
+        const session = window.AapdaAuth.requireAuth(['shelter', 'admin']);
+        if (session) {
+          document.getElementById('shelter-user-display').textContent = `🏛️ ${session.name}`;
+        }
+      }
+
+      initMap();
+    });
+
+    function logout() {
+      if (window.AapdaAuth) window.AapdaAuth.logout();
+      else {
+        localStorage.removeItem('aapdasetu_auth_v1');
+        window.location.href = 'login.html';
+      }
+    }
+
+    function initMap() {
+      map = L.map('shelter-map', {
+        zoomControl: true,
+        attributionControl: false
+      }).setView([26.585, 93.171], 9);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        maxZoom: 18,
+        subdomains: 'abcd'
+      }).addTo(map);
+
+      // Primary Camp Marker (Teal)
+      const shelterIcon = L.divIcon({
+        html: `<div class="marker-shelter-active">⛺</div>`,
+        className: 'shelter-pin-icon',
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
+      });
+
+      const m = L.marker([26.585, 93.171], { icon: shelterIcon }).addTo(map);
+      m.bindPopup(`
+        <div style="font-family:'Inter',sans-serif;font-size:12px;">
+          <strong style="color:#0f766e;">Kaziranga High School Relief Camp #1</strong>
+          <div style="margin:4px 0;">Occupancy: <strong>${occupancy} / ${capacity}</strong></div>
+          <div>Status: Active Receiving Station</div>
+        </div>
+      `).openPopup();
+
+      // Nearby citizen SOS markers
+      const sosIcon = L.divIcon({
+        html: `<div class="pulse-marker-sos"></div>`,
+        className: 'sos-pin-icon',
+        iconSize: [22, 22],
+        iconAnchor: [11, 11]
+      });
+
+      L.marker([26.620, 93.210], { icon: sosIcon }).addTo(map)
+        .bindPopup('<strong>SOS: Bokakhat Bypass</strong><br>4 citizens awaiting boat evacuation');
+
+      L.marker([26.510, 93.080], { icon: sosIcon }).addTo(map)
+        .bindPopup('<strong>SOS: Medical First Aid</strong><br>Hypothermia care required');
+    }
+
+    function adjustOccupancy(delta) {
+      occupancy = Math.max(0, Math.min(capacity, occupancy + delta));
+      document.getElementById('occ-count').textContent = occupancy;
+      const vacant = capacity - occupancy;
+      document.getElementById('occ-vacant').textContent = `${vacant} Vacant`;
+      const pct = Math.round((occupancy / capacity) * 100);
+      document.getElementById('occ-fill').style.width = `${pct}%`;
+      showToast(`Occupancy updated: ${occupancy} / ${capacity} beds (${pct}%)`);
+    }
+
+    function requestSupplies() {
+      showToast('📦 Emergency Re-supply Requisition submitted to SDMA Control Room!');
+    }
+
+    function ackRequest(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.add('acknowledged');
+        showToast('Request acknowledged! Relief dispatch squad notified.');
+      }
+    }
+
+    function resolveRequest(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.add('resolved');
+        setTimeout(() => {
+          el.style.display = 'none';
+          showToast('Incident marked resolved and logged to audit trail.');
+        }, 500);
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast-msg');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 3500);
+    }
+  </script>
+</body>
+</html>

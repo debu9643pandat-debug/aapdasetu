@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AapdaSetu OS | Role-Based Disaster Intelligence Gateway</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      background-color: #070c16;
+      color: #0f172a;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background grid */
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: 
+        radial-gradient(circle at 20% 20%, rgba(230, 57, 70, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(13, 148, 136, 0.12) 0%, transparent 40%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+      pointer-events: none;
+    }
+
+    .login-container {
+      position: relative;
+      width: 100%;
+      max-width: 1060px;
+      background: #ffffff;
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      z-index: 10;
+    }
+
+    /* LEFT BRAND PANEL (Dark Navy) */
+    .left-panel {
+      width: 40%;
+      background: linear-gradient(165deg, #0e1726 0%, #0a0f1a 100%);
+      color: #ffffff;
+      padding: 44px 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .brand-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .logo-badge {
+      width: 46px;
+      height: 46px;
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(239, 68, 68, 0.4);
+    }
+
+    .brand-title-wrap h1 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+    }
+
+    .brand-title-wrap .brand-tagline {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: #f97316;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .brand-desc {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #94a3b8;
+      margin-bottom: 30px;
+    }
+
+    /* Red Security Box */
+    .security-enforce-box {
+      background: rgba(220, 38, 38, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 24px;
+    }
+
+    .sec-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fca5a5;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .sec-body {
+      font-size: 12px;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+
+    .sec-body strong {
+      color: #ffffff;
+    }
+
+    .whitelisted-accounts {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(239, 68, 68, 0.25);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      color: #94a3b8;
+      word-break: break-all;
+    }
+
+    .whitelisted-accounts span {
+      color: #f87171;
+    }
+
+    .panel-footer-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      color: #64748b;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* RIGHT WORKSPACE PANEL (Clean White) */
+    .right-panel {
+      width: 60%;
+      background: #ffffff;
+      padding: 44px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .sso-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #e6f9f5;
+      color: #0d9488;
+      border: 1px solid #99f6e4;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      align-self: flex-start;
+      text-transform: uppercase;
+    }
+
+    .main-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .main-subtitle {
+      font-size: 13.5px;
+      color: #64748b;
+      margin-bottom: 26px;
+      line-height: 1.45;
+    }
+
+    .step-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    /* 3 Portal Role Selection Cards */
+    .role-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .role-card {
+      background: #ffffff;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px 14px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 145px;
+    }
+
+    .role-card:hover {
+      border-color: #cbd5e1;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.08);
+    }
+
+    .role-card.active-role {
+      border-color: #ef4444;
+      background: #fff8f8;
+      box-shadow: 0 10px 24px -6px rgba(239, 68, 68, 0.2);
+    }
+
+    .role-card-check {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #22c55e;
+      color: #fff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .role-card.active-role .role-card-check {
+      display: flex;
+    }
+
+    .role-icon {
+      font-size: 26px;
+      margin-bottom: 8px;
+    }
+
+    .role-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+
+    .role-sub {
+      font-size: 11px;
+      color: #64748b;
+      margin-bottom: 12px;
+      line-height: 1.35;
+    }
+
+    .role-badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .badge-red {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .badge-teal {
+      background: #ccfbf1;
+      color: #0f766e;
+      border: 1px solid #99f6e4;
+    }
+
+    .badge-amber {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    /* Warning Security Alert Box */
+    .constraint-alert-box {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #78350f;
+    }
+
+    .alert-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .constraint-title {
+      font-weight: 700;
+      color: #92400e;
+      margin-bottom: 2px;
+    }
+
+    .code-pill {
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #b45309;
+    }
+
+    /* Big Google SSO Button */
+    .google-signin-btn {
+      width: 100%;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-size: 14.5px;
+      font-weight: 600;
+      color: #1e293b;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+    }
+
+    .google-signin-btn:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+      box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .google-signin-btn:active {
+      transform: translateY(0);
+    }
+
+    .google-g-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Quick 1-Click Tester Row */
+    .quick-tester-bar {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px dashed #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tester-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .tester-chip {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tester-chip:hover {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+    }
+
+    /* POPUP GOOGLE MODAL SIMULATION */
+    .auth-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .auth-modal-card {
+      width: 100%;
+      max-width: 440px;
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalPop {
+      0% { transform: scale(0.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .auth-modal-top {
+      padding: 24px 28px 16px;
+      text-align: center;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .auth-modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-top: 10px;
+    }
+
+    .auth-modal-sub {
+      font-size: 12.5px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .auth-modal-body {
+      padding: 24px 28px;
+    }
+
+    .auth-input-group {
+      margin-bottom: 16px;
+    }
+
+    .auth-input-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .auth-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #0f172a;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .auth-input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .auth-error-msg {
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+      color: #991b1b;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1.4;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .auth-btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .auth-btn-cancel {
+      flex: 1;
+      padding: 12px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+    }
+
+    .auth-btn-submit {
+      flex: 2;
+      padding: 12px;
+      background: #ef4444;
+      border: none;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .auth-btn-submit.bg-blue {
+      background: #2563eb;
+    }
+
+    .auth-btn-submit.bg-teal {
+      background: #0d9488;
+    }
+
+    /* Responsive */
+    @media (max-width: 860px) {
+      .login-container {
+        flex-direction: column;
+      }
+      .left-panel, .right-panel {
+        width: 100%;
+      }
+      .role-cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+
+    <!-- LEFT BRAND PANEL (Matches Reference Image) -->
+    <div class="left-panel">
+      <div>
+        <div class="brand-top">
+          <div class="logo-badge">A</div>
+          <div class="brand-title-wrap">
+            <h1>AapdaSetu OS</h1>
+            <div class="brand-tagline">PAN-INDIA CRISIS INTELLIGENCE</div>
+          </div>
+        </div>
+
+        <p class="brand-desc">
+          Autonomous Disaster Intelligence Operating System. Multi-role tactical routing with role-specific views for State Administrators, Rescue Shelters, and Citizens.
+        </p>
+
+        <!-- Red Security Box -->
+        <div class="security-enforce-box">
+          <div class="sec-header">
+            <span>🔒</span>
+            <span>ADMIN SECURITY ENFORCEMENT</span>
+          </div>
+          <p class="sec-body">
+            The <strong>Administrative Command Panel</strong> is strictly restricted to authorized emails (<code>.gov.in</code>, <code>.nic.in</code>, or pre-whitelisted officers).
+          </p>
+          <div class="whitelisted-accounts">
+            Whitelisted Accounts: <span>commander.ndrf@gov.in</span>, <span>admin@aapdasetu.gov.in</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-footer-meta">
+        <span>IIITD 24H Hackathon</span>
+        <span>Team Tech Innovators</span>
+      </div>
+    </div>
+
+    <!-- RIGHT ACTION PANEL (Matches Reference Image) -->
+    <div class="right-panel">
+      <div class="sso-badge">
+        <span>🛡️</span> GOOGLE SINGLE SIGN-ON (SSO)
+      </div>
+
+      <h2 class="main-title">Select Your Role &amp; Sign In</h2>
+      <p class="main-subtitle">Sign in with Google to enter your role-specific disaster intelligence dashboard.</p>
+
+      <!-- STEP 1: PORTAL PICKER -->
+      <div class="step-label">STEP 1: CHOOSE OPERATIONAL PORTAL</div>
+      <div class="role-cards-grid">
+        
+        <!-- Role 1: Administrative End -->
+        <div class="role-card active-role" id="card-admin" onclick="selectRole('admin')">
+          <div class="role-card-check">✓</div>
+          <div>
+            <div class="role-icon">🛡️</div>
+            <div class="role-name">Administrative End</div>
+            <div class="role-sub">SDMA / NDRF Central Command</div>
+          </div>
+          <span class="role-badge badge-red">RESTRICTED (.gov...)</span>
+        </div>
+
+        <!-- Role 2: Rescue Shelters & NGOs -->
+        <div class="role-card" id="card-shelter" onclick="selectRole('shelter')">
+          <div class="role-card-check">✓</div>
+          <div>
+            <div class="role-icon">🏛️</div>
+            <div class="role-name">Rescue Shelters &amp; NGOs</div>
+            <div class="role-sub">Relief Operations Hub</div>
+          </div>
+          <span class="role-badge badge-teal">OPEN TO RELIEF WO...</span>
+        </div>
+
+        <!-- Role 3: Citizen / User End -->
+        <div class="role-card" id="card-citizen" onclick="selectRole('citizen')">
+          <div class="role-card-check">✓</div>
+          <div>
+            <div class="role-icon">👤</div>
+            <div class="role-name">Citizen / User End</div>
+            <div class="role-sub">Public Safety Shield</div>
+          </div>
+          <span class="role-badge badge-amber">OPEN TO ALL CITIZ...</span>
+        </div>
+
+      </div>
+
+      <!-- Constraint Alert Notice -->
+      <div class="constraint-alert-box" id="constraint-box">
+        <span class="alert-icon">🛡️</span>
+        <div>
+          <div class="constraint-title" id="constraint-title">Administrative Portal Security Constraint:</div>
+          <div id="constraint-text">
+            Only specified Google emails ending in <span class="code-pill">.gov.in</span>, <span class="code-pill">.nic.in</span>, or pre-approved accounts (<span class="code-pill">commander.ndrf@gov.in</span>) can sign in.
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: AUTHENTICATE -->
+      <div class="step-label">STEP 2: AUTHENTICATE IDENTITY</div>
+      <button class="google-signin-btn" id="btn-google-signin" onclick="openAuthModal()">
+        <!-- Google Colorful SVG Icon -->
+        <svg class="google-g-icon" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        <span id="btn-signin-text">Sign in with Google for Administrative End</span>
+      </button>
+
+      <!-- 1-Click Fast Tester Row -->
+      <div class="quick-tester-bar">
+        <span class="tester-label">⚡ 1-Click Demo Evaluation:</span>
+        <button class="tester-chip" onclick="quickLogin('admin')">👮 Enter as SDMA Officer</button>
+        <button class="tester-chip" onclick="quickLogin('shelter')">🏛️ Enter as NGO Shelter</button>
+        <button class="tester-chip" onclick="quickLogin('citizen')">👤 Enter as Citizen</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- AUTH POPUP MODAL (Google SSO Simulation) -->
+  <div class="auth-modal-overlay" id="auth-modal">
+    <div class="auth-modal-card">
+      <div class="auth-modal-top">
+        <svg class="google-g-icon" style="width: 32px; height: 32px;" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        <h3 class="auth-modal-title" id="modal-role-title">Sign in to AapdaSetu OS</h3>
+        <p class="auth-modal-sub" id="modal-role-sub">Administrative Command Verification</p>
+      </div>
+
+      <div class="auth-modal-body">
+        <div class="auth-error-msg" id="auth-error"></div>
+
+        <div class="auth-input-group" id="email-field-group">
+          <label for="auth-email">Official Google Account Email</label>
+          <input type="email" id="auth-email" class="auth-input" placeholder="e.g. commander.ndrf@gov.in" value="commander.ndrf@gov.in">
+        </div>
+
+        <div class="auth-input-group">
+          <label for="auth-name">Officer / Submitter Name</label>
+          <input type="text" id="auth-name" class="auth-input" placeholder="Your Full Name" value="DIG Rajeev Sharma (NDRF 1st Bn)">
+        </div>
+
+        <div class="auth-btn-row">
+          <button type="button" class="auth-btn-cancel" onclick="closeAuthModal()">Cancel</button>
+          <button type="button" class="auth-btn-submit" id="auth-submit-btn" onclick="submitAuth()">Verify &amp; Continue &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script>
+    let currentRole = 'admin';
+
+    const roleConfig = {
+      admin: {
+        title: 'Administrative End',
+        btnText: 'Sign in with Google for Administrative End',
+        constraintTitle: 'Administrative Portal Security Constraint:',
+        constraintText: 'Only specified Google emails ending in <span class="code-pill">.gov.in</span>, <span class="code-pill">.nic.in</span>, or pre-approved accounts (<span class="code-pill">commander.ndrf@gov.in</span>) can sign in.',
+        defaultEmail: 'commander.ndrf@gov.in',
+        defaultName: 'DIG Rajeev Sharma (NDRF 1st Bn)',
+        targetUrl: 'admin.html',
+        btnClass: ''
+      },
+      shelter: {
+        title: 'Rescue Shelters & NGOs',
+        btnText: 'Sign in with Google for Rescue Shelters & NGOs',
+        constraintTitle: 'Relief Operations Hub Access:',
+        constraintText: 'Authorized for registered NGO field teams (Red Cross, SEEDS India, Goonj) and Government Shelter Officers.',
+        defaultEmail: 'coordinator.assam@redcross.org.in',
+        defaultName: 'Priya Sen (Red Cross Lead)',
+        targetUrl: 'shelter.html',
+        btnClass: 'bg-teal'
+      },
+      citizen: {
+        title: 'Citizen / User End',
+        btnText: 'Continue to Public Safety Shield',
+        constraintTitle: 'Public Safety Shield (Zero Friction):',
+        constraintText: 'No official credentials required. Open to any citizen needing immediate SOS dispatch, shelter routing, and tremor alerts.',
+        defaultEmail: 'citizen@public.net',
+        defaultName: 'Citizen (Assam Sector)',
+        targetUrl: 'citizen.html',
+        btnClass: 'bg-blue'
+      }
+    };
+
+    function selectRole(role) {
+      currentRole = role;
+      document.querySelectorAll('.role-card').forEach(c => c.classList.remove('active-role'));
+      document.getElementById(`card-${role}`).classList.add('active-role');
+
+      const cfg = roleConfig[role];
+      document.getElementById('btn-signin-text').textContent = cfg.btnText;
+      document.getElementById('constraint-title').textContent = cfg.constraintTitle;
+      document.getElementById('constraint-text').innerHTML = cfg.constraintText;
+    }
+
+    function openAuthModal() {
+      const cfg = roleConfig[currentRole];
+      document.getElementById('modal-role-title').textContent = `Sign in to ${cfg.title}`;
+      document.getElementById('modal-role-sub').textContent = currentRole === 'admin' 
+        ? 'Restricted to .gov.in, .nic.in & whitelisted officers' 
+        : (currentRole === 'shelter' ? 'Relief worker & NGO coordinator access' : 'Instant citizen access');
+
+      document.getElementById('auth-email').value = cfg.defaultEmail;
+      document.getElementById('auth-name').value = cfg.defaultName;
+      
+      const submitBtn = document.getElementById('auth-submit-btn');
+      submitBtn.className = `auth-btn-submit ${cfg.btnClass}`;
+      
+      document.getElementById('auth-error').style.display = 'none';
+      document.getElementById('auth-modal').style.display = 'flex';
+    }
+
+    function closeAuthModal() {
+      document.getElementById('auth-modal').style.display = 'none';
+    }
+
+    function submitAuth() {
+      const email = document.getElementById('auth-email').value.trim();
+      const name = document.getElementById('auth-name').value.trim() || 'Verified User';
+      const errorEl = document.getElementById('auth-error');
+
+      if (currentRole === 'admin') {
+        const isValid = window.AapdaAuth ? window.AapdaAuth.isAdminEmail(email) : (email.endsWith('.gov.in') || email.endsWith('.nic.in') || email === 'commander.ndrf@gov.in');
+        if (!isValid) {
+          errorEl.textContent = '❌ Access Denied: Administrative Portal requires an official email ending in .gov.in, .nic.in, or pre-whitelisted commander credentials.';
+          errorEl.style.display = 'block';
+          return;
+        }
+      }
+
+      // Save login session
+      if (window.AapdaAuth) {
+        window.AapdaAuth.login(currentRole, email, name);
+      } else {
+        localStorage.setItem('aapdasetu_auth_v1', JSON.stringify({ role: currentRole, email, name }));
+      }
+
+      const target = roleConfig[currentRole].targetUrl;
+      window.location.href = target;
+    }
+
+    function quickLogin(role) {
+      const cfg = roleConfig[role];
+      if (window.AapdaAuth) {
+        window.AapdaAuth.login(role, cfg.defaultEmail, cfg.defaultName);
+      } else {
+        localStorage.setItem('aapdasetu_auth_v1', JSON.stringify({ role, email: cfg.defaultEmail, name: cfg.defaultName }));
+      }
+      window.location.href = cfg.targetUrl;
+    }
+
+    // Auto-redirect if already logged in and visiting login.html with a param or clean
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('logout') === 'true') {
+        if (window.AapdaAuth) window.AapdaAuth.logout();
+        else localStorage.removeItem('aapdasetu_auth_v1');
+      }
+    });
+  </script>
+</body>
+</html>
