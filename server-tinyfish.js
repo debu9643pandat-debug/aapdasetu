@@ -17,6 +17,34 @@
 const http = require('http');
 const https = require('https');
 const url = require('url');
+const fs = require('fs');
+const path = require('path');
+
+// Auto-load .env file if present (Zero npm dependencies needed!)
+function loadEnvFile() {
+  const envPath = path.join(__dirname, '.env');
+  if (fs.existsSync(envPath)) {
+    try {
+      const content = fs.readFileSync(envPath, 'utf8');
+      const lines = content.split(/\r?\n/);
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) continue;
+        const eqIdx = trimmed.indexOf('=');
+        if (eqIdx !== -1) {
+          const key = trimmed.slice(0, eqIdx).trim();
+          const val = trimmed.slice(eqIdx + 1).trim();
+          if (!process.env[key]) {
+            process.env[key] = val;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Could not read .env file:', e.message);
+    }
+  }
+}
+loadEnvFile();
 
 const PORT = process.env.PORT || 8081;
 const TINYFISH_API_KEY = process.env.TINYFISH_API_KEY || '';
