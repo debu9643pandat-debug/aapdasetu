@@ -178,7 +178,244 @@
 
   <!-- RUMOR & DUPLICATE ALERT DETECTOR WORKSPACE (VIEW 2) -->
   <main id="rumor-detector-workspace" class="rumor-workspace-layout" style="display: none;" aria-label="Rumor and duplicate alert detector">
-    <!-- Populated dynamically by window.RumorDetector.render() -->
+
+    <!-- KPI SUMMARY ROW -->
+    <section class="rumor-summary-grid">
+      <div class="rumor-kpi-card">
+        <span class="kpi-label">📥 Incoming Reports</span>
+        <span class="kpi-value text-blue" id="kpi-total">6</span>
+        <span class="kpi-desc">Total raw submissions</span>
+      </div>
+      <div class="rumor-kpi-card">
+        <span class="kpi-label">🔗 Linked Duplicates</span>
+        <span class="kpi-value text-amber" id="kpi-dupes">2</span>
+        <span class="kpi-desc">Grouped under primary pins</span>
+      </div>
+      <div class="rumor-kpi-card">
+        <span class="kpi-label">⚠️ Needing Review</span>
+        <span class="kpi-value text-crimson" id="kpi-review">2</span>
+        <span class="kpi-desc">Flagged with evidence</span>
+      </div>
+      <div class="rumor-kpi-card">
+        <span class="kpi-label">🛡️ Unique Incidents</span>
+        <span class="kpi-value text-teal" id="kpi-unique">4</span>
+        <span class="kpi-desc">Distinct validated events</span>
+      </div>
+      <div class="rumor-kpi-card">
+        <span class="kpi-label">✅ Officially Confirmed</span>
+        <span class="kpi-value text-green" id="kpi-confirmed">1</span>
+        <span class="kpi-desc">Verified by SDMA / NDRF</span>
+      </div>
+    </section>
+
+    <!-- OPS SUBBAR -->
+    <div class="rumor-ops-subbar">
+      <div class="ops-clarity-notice">
+        <strong>OPERATIONAL DISTINCTION:</strong>
+        <span>6 incoming claims represent <strong>4 unique ground incidents</strong>. Unverified claims are never presented as facts.</span>
+      </div>
+      <div class="ops-actions-group">
+        <button class="btn-micro-action" onclick="document.getElementById('tinyfish-modal').classList.add('modal-visible')">🐟 TinyFish API Bridge ℹ️</button>
+        <button class="btn-micro-action" onclick="window.RumorDetector && window.RumorDetector.resetReports()">↺ Reset Reports</button>
+      </div>
+    </div>
+
+    <!-- MAIN 2-COLUMN WORKSPACE -->
+    <div class="rumor-workspace-body">
+
+      <!-- LEFT: REPORT CARDS QUEUE -->
+      <div class="rumor-queue-column">
+        <div class="queue-header">
+          <div class="queue-title-row">
+            <h3>Incoming Disaster Reports</h3>
+            <span class="queue-badge">6 Shown</span>
+          </div>
+          <div class="queue-filter-row">
+            <input type="text" id="rumor-search-input" class="rumor-search-input" placeholder="Search claim, location, source...">
+          </div>
+          <div class="queue-status-pills">
+            <button class="pill-btn active" onclick="window.RumorDetector && window.RumorDetector.setStatusFilter('all')">All</button>
+            <button class="pill-btn" onclick="window.RumorDetector && window.RumorDetector.setStatusFilter('needs review')">Needs Review</button>
+            <button class="pill-btn" onclick="window.RumorDetector && window.RumorDetector.setStatusFilter('unverified')">Unverified</button>
+            <button class="pill-btn" onclick="window.RumorDetector && window.RumorDetector.setStatusFilter('corroborated')">Corroborated</button>
+            <button class="pill-btn" onclick="window.RumorDetector && window.RumorDetector.setStatusFilter('officially confirmed')">Confirmed</button>
+            <button class="pill-btn" onclick="window.RumorDetector && window.RumorDetector.setStatusFilter('rejected')">Rejected</button>
+          </div>
+        </div>
+
+        <!-- STATIC REPORT CARDS - Always visible -->
+        <div class="queue-card-list" id="queue-card-list">
+
+          <article class="report-feed-card active-report" id="card-REP-101" onclick="window.RumorDetector && window.RumorDetector.selectReport('REP-101')">
+            <div class="report-card-top">
+              <span class="report-id-tag">REP-101</span>
+              <span class="report-status-badge status-review">Needs Review</span>
+            </div>
+            <p class="report-claim-snippet">BREAKING: Kaziranga NH-37 completely collapsed and washed away near Bokakhat! 15 buses submerged, national park entrance cut off.</p>
+            <div class="report-flags-row">
+              <span class="flag-badge flag-old-media">⚠️ Old Media</span>
+              <span class="flag-badge flag-conflict">⚔️ Conflicting</span>
+            </div>
+            <div class="report-duplicate-badge">🔗 Grouped with Incident <strong>#inc-003</strong></div>
+            <div class="report-card-footer">
+              <span class="report-source">📡 Viral Social Post (X / Twitter)</span>
+              <span class="report-time">⏱️ 25 mins ago</span>
+            </div>
+          </article>
+
+          <article class="report-feed-card" id="card-REP-102" onclick="window.RumorDetector && window.RumorDetector.selectReport('REP-102')">
+            <div class="report-card-top">
+              <span class="report-id-tag">REP-102</span>
+              <span class="report-status-badge status-corroborated">Corroborated</span>
+            </div>
+            <p class="report-claim-snippet">Water crossing NH-37 near Kaziranga animal corridor, trucks halted on higher elevation.</p>
+            <div class="report-duplicate-badge">🔗 Grouped with Incident <strong>#inc-003</strong></div>
+            <div class="report-card-footer">
+              <span class="report-source">📡 Citizen Field SOS via AapdaSetu Portal</span>
+              <span class="report-time">⏱️ 40 mins ago</span>
+            </div>
+          </article>
+
+          <article class="report-feed-card" id="card-REP-103" onclick="window.RumorDetector && window.RumorDetector.selectReport('REP-103')">
+            <div class="report-card-top">
+              <span class="report-id-tag">REP-103</span>
+              <span class="report-status-badge status-confirmed">Officially Confirmed</span>
+            </div>
+            <p class="report-claim-snippet">Meppadi village completely cut off — landslide blocked only road. 200+ residents need helicopter evacuation.</p>
+            <div class="report-card-footer">
+              <span class="report-source">📡 Kerala SDRF Official Radio Dispatch</span>
+              <span class="report-time">⏱️ 1 hour ago</span>
+            </div>
+          </article>
+
+          <article class="report-feed-card" id="card-REP-104" onclick="window.RumorDetector && window.RumorDetector.selectReport('REP-104')">
+            <div class="report-card-top">
+              <span class="report-id-tag">REP-104</span>
+              <span class="report-status-badge status-review">Needs Review</span>
+            </div>
+            <p class="report-claim-snippet">Viral photo: Entire Paradip Port infrastructure submerged under Cyclone Tej. Ships capsized in harbour.</p>
+            <div class="report-flags-row">
+              <span class="flag-badge flag-old-media">⚠️ Old Media</span>
+              <span class="flag-badge flag-loc-mismatch">📍 Location Mismatch</span>
+              <span class="flag-badge flag-conflict">⚔️ Conflicting</span>
+            </div>
+            <div class="report-card-footer">
+              <span class="report-source">📡 Viral WhatsApp Forward</span>
+              <span class="report-time">⏱️ 2 hours ago</span>
+            </div>
+          </article>
+
+          <article class="report-feed-card" id="card-REP-105" onclick="window.RumorDetector && window.RumorDetector.selectReport('REP-105')">
+            <div class="report-card-top">
+              <span class="report-id-tag">REP-105</span>
+              <span class="report-status-badge status-unverified">Unverified</span>
+            </div>
+            <p class="report-claim-snippet">Culvert erosion noticed near Jamunamukh village ring bund; water seeping through earthen bank.</p>
+            <div class="report-card-footer">
+              <span class="report-source">📡 Citizen Field SOS via AapdaSetu Portal</span>
+              <span class="report-time">⏱️ 1 hour ago</span>
+            </div>
+          </article>
+
+          <article class="report-feed-card" id="card-REP-106" onclick="window.RumorDetector && window.RumorDetector.selectReport('REP-106')">
+            <div class="report-card-top">
+              <span class="report-id-tag">REP-106</span>
+              <span class="report-status-badge status-rejected">Rejected</span>
+            </div>
+            <p class="report-claim-snippet">Viral Voice Note: Guwahati Brahmaputra Dam sluice gates opened, 10-meter wave expected in 45 minutes!</p>
+            <div class="report-flags-row">
+              <span class="flag-badge flag-old-media">⚠️ Recycled Audio Hoax</span>
+              <span class="flag-badge flag-loc-mismatch">📍 Infrastructure Impossibility</span>
+              <span class="flag-badge flag-conflict">⚔️ Official Contradiction</span>
+            </div>
+            <div class="report-card-footer">
+              <span class="report-source">📡 Viral Audio Note on Messaging Channels</span>
+              <span class="report-time">⏱️ 30 mins ago</span>
+            </div>
+          </article>
+
+        </div>
+      </div>
+
+      <!-- RIGHT: EVIDENCE PANEL - populated by RumorDetector.render() -->
+      <div class="rumor-evidence-column" id="rumor-evidence-panel">
+        <div class="evidence-panel-inner">
+          <div class="evidence-top-header">
+            <div class="evidence-title-row">
+              <div>
+                <span class="evidence-id-pill">REP-101 • Hazard / Roadblock</span>
+                <h2 class="evidence-main-title">BREAKING: Kaziranga NH-37 completely collapsed and washed away near Bokakhat! 15 buses submerged, national park entrance cut off.</h2>
+              </div>
+              <div class="evidence-status-box">
+                <span class="status-big-badge status-review">Needs Review</span>
+              </div>
+            </div>
+            <div class="evidence-metadata-strip">
+              <span>📍 <strong>Location:</strong> Bokakhat, Kaziranga NH-37, Assam</span>
+              <span>📡 <strong>Source:</strong> Viral Social Post (X / Twitter)</span>
+              <span>🕒 <strong>Reported:</strong> 25 mins ago | <strong>Published:</strong> Today, 2:15 PM</span>
+              <span>🔄 <strong>Last Checked:</strong> 3 mins ago</span>
+            </div>
+          </div>
+
+          <!-- FORENSIC FLAGS -->
+          <section class="evidence-section-card forensic-card">
+            <h3 class="evidence-card-title">🔍 FORENSIC ANALYSIS &amp; DETECTION FLAGS</h3>
+            <div class="forensic-flags-container">
+              <div class="flag-evidence-item flag-danger-tint">
+                <div class="flag-header"><span class="flag-icon">⚠️</span><strong>Old Video / Recycled Media Detected</strong></div>
+                <p class="flag-text">Visual reverse-search and TinyFish image-hash match video keyframe to a July 2022 flood broadcast. The current flood level is +1.6m over road, but the structural bridge has NOT collapsed.</p>
+              </div>
+              <div class="flag-evidence-item flag-clean-tint">
+                <div class="flag-header"><span class="flag-icon">✓</span><strong>Spatial Topology Consistent</strong></div>
+                <p class="flag-text">Reported location matches geographic terrain and regional drainage basin coordinates.</p>
+              </div>
+              <div class="flag-evidence-item flag-amber-tint">
+                <div class="flag-header"><span class="flag-icon">⚔️</span><strong>Conflicting Details Between Sources</strong></div>
+                <p class="flag-text">Claim asserts "15 buses submerged and bridge collapsed". Assam Police Highway Patrol and NDRF boat unit report 0 submerged passenger buses; traffic was proactively halted.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- TRUSTED SOURCE COMPARISON -->
+          <section class="evidence-section-card trusted-card">
+            <div class="card-title-with-btn">
+              <h3 class="evidence-card-title">🏛️ TRUSTED OFFICIAL SOURCE COMPARISON</h3>
+              <button id="btn-tinyfish-REP-101" class="btn-tinyfish-scan" onclick="window.RumorDetector && window.RumorDetector.triggerTinyFishScan('REP-101')">
+                🐟 Run TinyFish Live Search &amp; Fetch Scan
+              </button>
+            </div>
+            <div class="trusted-comparison-grid">
+              <div class="trusted-field"><span class="field-label">Official Source:</span><strong class="field-val">ASDMA Bulletin #42</strong></div>
+              <div class="trusted-field"><span class="field-label">Official Statement:</span><strong class="field-val">Water inundation of 1.6m recorded. Bailey bridge and pavement foundation are structurally intact. Heavy vehicular transit suspended.</strong></div>
+              <div class="trusted-field verdict-field"><span class="field-label">Verdict:</span><strong class="field-val verdict-text-danger">Contradicted (Exaggerated Claim &amp; Recycled 2022 Media)</strong></div>
+            </div>
+          </section>
+
+          <!-- AUDIT TRAIL -->
+          <section class="evidence-section-card audit-card">
+            <h3 class="evidence-card-title">📋 IMMUTABLE AUDIT TRAIL</h3>
+            <div class="audit-trail-list" id="audit-trail-REP-101">
+              <div class="audit-entry"><span class="audit-time">14:15</span><span class="audit-actor">Automated Ingestion Feed</span><span class="audit-action">Ingested viral social claim with video attachment.</span></div>
+              <div class="audit-entry"><span class="audit-time">14:20</span><span class="audit-actor">AI Forensic Engine</span><span class="audit-action">Flagged: Old Media Suspect (July 2022 footage match) &amp; Conflicting Damage Details.</span></div>
+              <div class="audit-entry"><span class="audit-time">14:35</span><span class="audit-actor">SDMA Officer #14</span><span class="audit-action">Set status to "Needs Review". Cross-checking with Golaghat SP control room.</span></div>
+            </div>
+          </section>
+
+          <!-- STATUS CONTROLS -->
+          <section class="evidence-section-card workflow-card">
+            <h3 class="evidence-card-title">🔧 RESPONDER WORKFLOW CONTROLS</h3>
+            <div class="workflow-actions-row">
+              <button class="wf-btn wf-corroborate" onclick="window.RumorDetector && window.RumorDetector.updateStatus('REP-101','Corroborated')">✅ Mark Corroborated</button>
+              <button class="wf-btn wf-confirm" onclick="window.RumorDetector && window.RumorDetector.updateStatus('REP-101','Officially Confirmed')">🏛️ Officially Confirm</button>
+              <button class="wf-btn wf-reject" onclick="window.RumorDetector && window.RumorDetector.updateStatus('REP-101','Rejected')">❌ Reject as Rumor</button>
+            </div>
+          </section>
+
+        </div>
+      </div>
+
+    </div>
   </main>
 
   <!-- MODAL: + INJECT FIELD SOS INCIDENT REPORTING FORM -->
@@ -490,11 +727,11 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
           integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-  <!-- AapdaSetu JavaScript Modules -->
-  <script src="js/priority-engine.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/map.js"></script>
-  <script src="js/rumor-detector.js"></script>
-  <script src="js/app.js"></script>
+  <!-- AapdaSetu JavaScript Modules (v2.1 cache-bust) -->
+  <script src="js/priority-engine.js?v=21"></script>
+  <script src="js/data.js?v=21"></script>
+  <script src="js/map.js?v=21"></script>
+  <script src="js/rumor-detector.js?v=21"></script>
+  <script src="js/app.js?v=21"></script>
 </body>
 </html>
